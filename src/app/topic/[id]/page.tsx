@@ -1,0 +1,313 @@
+"use client";
+
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useState, useEffect, use } from 'react';
+
+import { charactersData, mockRanking } from '../../../data/mockData';
+import { getRankBadgeColor } from '../../../utils/helpers';
+import BackButton from '../../../components/BackButton';
+import ProfileBadge from '../../../components/ProfileBadge';
+
+export default function TopicDetail({ params }: { params: Promise<{ id: string }> }) {
+  const router = useRouter();
+  const resolvedParams = use(params);
+  const [character, setCharacter] = useState<any>(null);
+  const [charIndex, setCharIndex] = useState(0);
+  const [activeTab, setActiveTab] = useState<'detail' | 'ranking'>('detail');
+  const [displayedChars, setDisplayedChars] = useState<any[]>([]);
+
+  useEffect(() => {
+    // Filter characters based on user gender
+    const userGender = localStorage.getItem('userGender');
+    const targetType = userGender === 'FEMALE' ? 'cowo' : 'cewe';
+
+    // Get all characters of the target type
+    const allChars = [
+      { id: 'lin-yu', type: 'cowo' }, { id: 'sato-shun', type: 'cowo' }, { id: 'deryck', type: 'cowo' },
+      { id: 'mei-lian', type: 'cewe' }, { id: 'kisaragi-rei', type: 'cewe' }, { id: 'scarlett-hayes', type: 'cewe' }
+    ];
+    const filtered = allChars.filter(c => c.type === targetType).map(c => charactersData.find(ch => ch.id === c.id)!);
+    setDisplayedChars(filtered);
+
+    const idx = filtered.findIndex(c => c.id === resolvedParams.id);
+    if (idx !== -1) {
+      setCharIndex(idx);
+      setCharacter(filtered[idx]);
+    } else if (filtered.length > 0) {
+      setCharIndex(0);
+      setCharacter(filtered[0]);
+    } else {
+      router.push('/dashboard');
+    }
+  }, [resolvedParams.id, router]);
+
+
+
+  if (!character) return <div style={{ minHeight: '100vh', backgroundColor: '#0f1015' }}></div>;
+
+  return (
+    <main style={{
+      minHeight: '100vh',
+      backgroundImage: 'url("/bg_kelas.png")',
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      position: 'relative',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center'
+    }}>
+      {/* Dark overlay */}
+      <div style={{
+        position: 'absolute',
+        top: 0, left: 0, right: 0, bottom: 0,
+        backgroundColor: 'rgba(15, 16, 21, 0.3)',
+        zIndex: 0
+      }}></div>
+
+      {/* Back button */}
+      <BackButton href="/dashboard" style={{ position: 'absolute', top: '1.5rem', left: '1.5rem', zIndex: 10 }} />
+
+      {/* Profile Badge - Top Right */}
+      <ProfileBadge 
+        name="Pemain 1" 
+        size="small" 
+        style={{ position: 'absolute', top: '1.5rem', right: '1.5rem', zIndex: 10 }} 
+      />
+
+      {/* Title Banner - "Pilih Karakter" */}
+      <div style={{
+        position: 'relative',
+        zIndex: 5,
+        marginTop: '1.5rem',
+        backgroundColor: '#f0944d',
+        padding: '10px 50px',
+        borderRadius: '8px',
+        boxShadow: '0 4px 15px rgba(240, 148, 77, 0.4)'
+      }}>
+        <h1 style={{
+          color: 'white',
+          fontSize: '1.5rem',
+          fontWeight: '700',
+          fontStyle: 'italic',
+          textShadow: '0 2px 4px rgba(0,0,0,0.2)'
+        }}>
+          Pilih Karakter
+        </h1>
+      </div>
+
+      {/* Main Card Area */}
+      <div style={{
+        position: 'relative',
+        zIndex: 5,
+        marginTop: '1.5rem',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '1.5rem',
+        width: '100%',
+        maxWidth: '800px',
+        padding: '0 2rem',
+        flex: 1
+      }}>
+
+        {/* Center Card */}
+        <div style={{
+          flex: 1,
+          backgroundColor: 'rgba(255, 255, 255, 0.95)',
+          borderRadius: '16px',
+          overflow: 'hidden',
+          boxShadow: '0 10px 40px rgba(0,0,0,0.3)',
+          display: 'flex',
+          minHeight: '420px'
+        }}>
+
+          {/* Left: Character Image */}
+          <div style={{
+            width: '45%',
+            position: 'relative',
+            backgroundColor: '#e8e0d8',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'flex-end',
+            overflow: 'hidden'
+          }}>
+            <img
+              src={character.image}
+              alt={character.name}
+              className="animate-fade-in"
+              key={character.id}
+              style={{
+                height: '90%',
+                objectFit: 'contain',
+                position: 'absolute',
+                bottom: '20px',
+                zIndex: 1
+              }}
+            />
+            {/* Gradient overlay on character */}
+            <div style={{
+              position: 'absolute',
+              top: 0, left: 0, right: 0, bottom: 0,
+              background: 'linear-gradient(180deg, rgba(30, 20, 40, 0.15) 0%, transparent 30%, transparent 60%, rgba(30, 20, 40, 0.25) 100%)',
+              zIndex: 2,
+              pointerEvents: 'none'
+            }}></div>
+            {/* Affection Bar */}
+            <div style={{
+              position: 'absolute',
+              bottom: '0',
+              left: '0',
+              right: '0',
+              height: '8px',
+              backgroundColor: 'rgba(0,0,0,0.15)',
+              zIndex: 3
+            }}>
+              <div style={{
+                width: '30%',
+                height: '100%',
+                background: 'linear-gradient(90deg, #ff477e, #ff6b9d)',
+                borderRadius: '0 4px 4px 0'
+              }}></div>
+            </div>
+          </div>
+
+          {/* Right: Tabs & Content */}
+          <div style={{
+            width: '55%',
+            display: 'flex',
+            flexDirection: 'column'
+          }}>
+            {/* Tab Buttons */}
+            <div style={{ display: 'flex', borderBottom: '2px solid #f0f0f0' }}>
+              <button
+                onClick={() => setActiveTab('detail')}
+                style={{
+                  flex: 1,
+                  padding: '14px',
+                  border: 'none',
+                  backgroundColor: activeTab === 'detail' ? '#f0944d' : '#fff',
+                  color: activeTab === 'detail' ? 'white' : '#999',
+                  fontWeight: '700',
+                  fontSize: '0.95rem',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                  borderRadius: activeTab === 'detail' ? '0 0 8px 0' : '0'
+                }}
+              >
+                Detail
+              </button>
+              <button
+                onClick={() => setActiveTab('ranking')}
+                style={{
+                  flex: 1,
+                  padding: '14px',
+                  border: 'none',
+                  backgroundColor: activeTab === 'ranking' ? '#f0944d' : '#fff',
+                  color: activeTab === 'ranking' ? 'white' : '#999',
+                  fontWeight: '700',
+                  fontSize: '0.95rem',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                  borderRadius: activeTab === 'ranking' ? '0 0 0 8px' : '0'
+                }}
+              >
+                Ranking
+              </button>
+            </div>
+
+            {/* Tab Content */}
+            <div style={{ flex: 1, padding: '1.5rem', overflowY: 'auto' }}>
+              {activeTab === 'detail' ? (
+                <div className="animate-fade-in" key="detail">
+                  <h3 style={{ fontSize: '1.3rem', color: '#333', marginBottom: '8px', fontWeight: '700' }}>
+                    {character.name}
+                  </h3>
+                  {character.info.split(/(Hobi:[^.]*\.)/).map((part: string, i: number) =>
+                    part.startsWith('Hobi:') ? (
+                      <p key={i} style={{
+                        fontWeight: '700',
+                        color: '#f0944d',
+                        fontSize: '0.9rem',
+                        lineHeight: '1.6',
+                        margin: '10px 0',
+                        padding: '8px 12px',
+                        backgroundColor: 'rgba(240, 148, 77, 0.08)',
+                        borderLeft: '3px solid #f0944d',
+                        borderRadius: '0 6px 6px 0'
+                      }}>{part}</p>
+                    ) : part.trim() ? (
+                      <p key={i} style={{ fontSize: '0.9rem', color: '#777', lineHeight: '1.7', margin: '0' }}>{part}</p>
+                    ) : null
+                  )}
+                </div>
+              ) : (
+                <div className="animate-fade-in" key="ranking" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  {mockRanking.map((player) => (
+                    <div key={player.rank} style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '10px',
+                      padding: '8px 12px',
+                      borderRadius: '8px',
+                      backgroundColor: player.rank <= 3 ? 'rgba(240, 148, 77, 0.08)' : 'transparent'
+                    }}>
+                      {/* Rank Badge */}
+                      <div style={{
+                        width: '28px', height: '28px',
+                        borderRadius: '50%',
+                        backgroundColor: getRankBadgeColor(player.rank),
+                        color: 'white',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontWeight: 'bold', fontSize: '0.8rem',
+                        flexShrink: 0
+                      }}>
+                        {player.rank}
+                      </div>
+                      {/* Name */}
+                      <span style={{ flex: 1, fontSize: '0.85rem', color: '#444', fontWeight: '500' }}>
+                        {player.name}
+                      </span>
+                      {/* Score */}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <span style={{ color: '#22c55e', fontSize: '0.8rem' }}>✓</span>
+                        <span style={{ fontSize: '0.85rem', color: '#333', fontWeight: '600' }}>{player.score}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+
+
+      </div>
+
+      {/* Bottom: Mulai Button */}
+      <div style={{ position: 'relative', zIndex: 5, marginTop: '1.5rem', marginBottom: '2rem' }}>
+        <Link href={`/dialog/${character.id}`} style={{ textDecoration: 'none' }}>
+          <button style={{
+            padding: '14px 60px',
+            backgroundColor: '#ff477e',
+            color: 'white',
+            border: 'none',
+            borderRadius: '30px',
+            fontSize: '1.2rem',
+            fontWeight: '700',
+            cursor: 'pointer',
+            boxShadow: '0 6px 20px rgba(255, 71, 126, 0.5)',
+            transition: 'transform 0.2s, box-shadow 0.2s'
+          }}
+            onMouseOver={(e) => { e.currentTarget.style.transform = 'scale(1.05)'; e.currentTarget.style.boxShadow = '0 8px 25px rgba(255, 71, 126, 0.6)'; }}
+            onMouseOut={(e) => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = '0 6px 20px rgba(255, 71, 126, 0.5)'; }}
+          >
+            Mulai
+          </button>
+        </Link>
+      </div>
+
+    </main>
+  );
+}
