@@ -64,8 +64,8 @@ export default function DialogPage({ params }: { params: Promise<{ id: string }>
 
       {/* Character Image */}
       <img 
-        src="/character_dialog.png" 
-        alt="Character Dialog" 
+        src={character.image} 
+        alt={character.name} 
         className="animate-fade-in"
         style={{
           position: 'absolute',
