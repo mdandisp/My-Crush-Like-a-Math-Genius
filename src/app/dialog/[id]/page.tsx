@@ -62,21 +62,29 @@ export default function DialogPage({ params }: { params: Promise<{ id: string }>
         Lewati
       </button>
 
-      {/* Character Image */}
-      <img 
-        src={character.image} 
-        alt={character.name} 
-        className="animate-fade-in"
-        style={{
-          position: 'absolute',
-          bottom: '0',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          height: '95%',
-          objectFit: 'contain',
-          zIndex: 5
-        }}
-      />
+      {/* Character Image (Zoomed In Half-Body) */}
+      <div style={{
+        position: 'absolute',
+        top: 0, left: 0, right: 0, bottom: 0,
+        overflow: 'hidden',
+        pointerEvents: 'none',
+        zIndex: 5
+      }}>
+        <img 
+          src={character.image} 
+          alt={character.name} 
+          className="animate-fade-in"
+          style={{
+            position: 'absolute',
+            bottom: '-35%', // Push the legs completely off screen
+            left: '50%',
+            transform: 'translateX(-50%)',
+            height: '150%', // Enlarge the image
+            objectFit: 'contain',
+            objectPosition: 'bottom center'
+          }}
+        />
+      </div>
 
       {/* Dialog Box Area */}
       <div style={{
