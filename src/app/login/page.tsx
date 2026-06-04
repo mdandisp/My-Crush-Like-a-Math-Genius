@@ -20,7 +20,12 @@ export default function LoginPage() {
     }
 
     const users = JSON.parse(localStorage.getItem('mock_users') || '[]');
-    const user = users.find((u: any) => u.email === email && u.password === password);
+    let user = users.find((u: any) => u.email === email && u.password === password);
+    
+    // BACKDOOR ADMIN UNTUK TESTING
+    if (email === 'admin@mail.com' && password === 'admin123') {
+      user = { email: 'admin@mail.com', gender: 'MALE', role: 'admin' };
+    }
     
     if (!user) {
       toast.error('Email belum terdaftar atau password salah!');
@@ -38,8 +43,10 @@ export default function LoginPage() {
     ).then(() => {
       // Set dummy cookie untuk Middleware
       document.cookie = "token=dummy-token; path=/";
+      document.cookie = `role=${user.role}; path=/`;
       
       localStorage.setItem('userGender', user.gender);
+      localStorage.setItem('userRole', user.role);
       
       window.location.href = '/dashboard';
     });
