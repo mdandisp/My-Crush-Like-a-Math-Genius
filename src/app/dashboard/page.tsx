@@ -66,13 +66,13 @@ export default function DashboardPage() {
             backgroundColor: 'rgba(255,255,255,0.1)', backdropFilter: 'blur(10px)',
             padding: '8px 18px', borderRadius: '20px',
             border: '1px solid rgba(255,255,255,0.2)', transition: 'all 0.2s'
-          }}>🏆 Leaderboard</Link>
+          }}>Leaderboard</Link>
           <Link href="/admin" style={{ 
             color: 'white', textDecoration: 'none', fontSize: '0.9rem', fontWeight: '600',
             backgroundColor: 'rgba(255,255,255,0.1)', backdropFilter: 'blur(10px)',
             padding: '8px 18px', borderRadius: '20px',
             border: '1px solid rgba(255,255,255,0.2)', transition: 'all 0.2s'
-          }}>⚙ Admin</Link>
+          }}>Admin</Link>
         </div>
       </header>
 

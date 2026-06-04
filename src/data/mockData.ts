@@ -69,3 +69,12 @@ export const mockDialogues: Record<string, string[]> = {
     "Siapkan dirimu. Kuis ini akan berjalan dengan tempo tinggi!"
   ]
 };
+
+export const GAME_SETTINGS = {
+  maxAttemptsPerCharacter: 3,
+  questionLimits: {
+    'Easy': 15,
+    'Medium': 10,
+    'Hard': 5
+  }
+};

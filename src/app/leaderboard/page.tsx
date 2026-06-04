@@ -68,7 +68,7 @@ export default function LeaderboardPage() {
           color: 'white', fontSize: '1.5rem', fontWeight: '700',
           fontStyle: 'italic', textShadow: '0 2px 4px rgba(0,0,0,0.2)'
         }}>
-          🏆 Leaderboard
+          Leaderboard
         </h1>
       </div>
 

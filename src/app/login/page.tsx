@@ -14,13 +14,20 @@ export default function LoginPage() {
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validasi kosong
     if (!email || !password) {
       toast.error('Email dan password harus diisi!');
       return;
     }
 
-    // Simulasi loading/verifikasi
+    const users = JSON.parse(localStorage.getItem('mock_users') || '[]');
+    const user = users.find((u: any) => u.email === email && u.password === password);
+    
+    if (!user) {
+      toast.error('Email belum terdaftar atau password salah!');
+      return;
+    }
+
+    // Simulasikan loading/verifikasi
     toast.promise(
       new Promise((resolve) => setTimeout(resolve, 800)),
       {
@@ -32,11 +39,9 @@ export default function LoginPage() {
       // Set dummy cookie untuk Middleware
       document.cookie = "token=dummy-token; path=/";
       
-      // Sebagai mock, jika login dan belum ada gender, kita set default MALE
-      if (!localStorage.getItem('userGender')) {
-        localStorage.setItem('userGender', 'MALE');
-      }
-      router.push('/dashboard');
+      localStorage.setItem('userGender', user.gender);
+      
+      window.location.href = '/dashboard';
     });
   };
 

@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect, use } from 'react';
 
-import { charactersData, mockRanking } from '../../../data/mockData';
+import { charactersData, mockRanking, GAME_SETTINGS } from '../../../data/mockData';
 import { getRankBadgeColor } from '../../../utils/helpers';
 import BackButton from '../../../components/BackButton';
 import ProfileBadge from '../../../components/ProfileBadge';
@@ -16,6 +16,9 @@ export default function TopicDetail({ params }: { params: Promise<{ id: string }
   const [charIndex, setCharIndex] = useState(0);
   const [activeTab, setActiveTab] = useState<'detail' | 'ranking'>('detail');
   const [displayedChars, setDisplayedChars] = useState<any[]>([]);
+  const [difficulty, setDifficulty] = useState<'Easy' | 'Medium' | 'Hard'>('Easy');
+  const [questionCount, setQuestionCount] = useState<number | ''>(5);
+  const [attempts, setAttempts] = useState(0);
 
   useEffect(() => {
     // Filter characters based on user gender
@@ -40,7 +43,20 @@ export default function TopicDetail({ params }: { params: Promise<{ id: string }
     } else {
       router.push('/dashboard');
     }
+
+    // Load attempts history
+    const history = JSON.parse(localStorage.getItem('quiz_attempts') || '[]');
+    const charAttempts = history.filter((h: any) => h.characterId === resolvedParams.id);
+    setAttempts(charAttempts.length);
   }, [resolvedParams.id, router]);
+
+  // Adjust question count if it exceeds new difficulty max
+  useEffect(() => {
+    const max = GAME_SETTINGS.questionLimits[difficulty];
+    if (typeof questionCount === 'number' && questionCount > max) {
+      setQuestionCount(max);
+    }
+  }, [difficulty]);
 
 
 
@@ -69,10 +85,10 @@ export default function TopicDetail({ params }: { params: Promise<{ id: string }
       <BackButton href="/dashboard" style={{ position: 'absolute', top: '1.5rem', left: '1.5rem', zIndex: 10 }} />
 
       {/* Profile Badge - Top Right */}
-      <ProfileBadge 
-        name="Pemain 1" 
-        size="small" 
-        style={{ position: 'absolute', top: '1.5rem', right: '1.5rem', zIndex: 10 }} 
+      <ProfileBadge
+        name="Pemain 1"
+        size="small"
+        style={{ position: 'absolute', top: '1.5rem', right: '1.5rem', zIndex: 10 }}
       />
 
       {/* Title Banner - "Pilih Karakter" */}
@@ -285,27 +301,96 @@ export default function TopicDetail({ params }: { params: Promise<{ id: string }
 
       </div>
 
-      {/* Bottom: Mulai Button */}
-      <div style={{ position: 'relative', zIndex: 5, marginTop: '1.5rem', marginBottom: '2rem' }}>
-        <Link href={`/dialog/${character.id}`} style={{ textDecoration: 'none' }}>
-          <button style={{
-            padding: '14px 60px',
-            backgroundColor: '#ff477e',
-            color: 'white',
-            border: 'none',
-            borderRadius: '30px',
-            fontSize: '1.2rem',
-            fontWeight: '700',
-            cursor: 'pointer',
-            boxShadow: '0 6px 20px rgba(255, 71, 126, 0.5)',
-            transition: 'transform 0.2s, box-shadow 0.2s'
-          }}
-            onMouseOver={(e) => { e.currentTarget.style.transform = 'scale(1.05)'; e.currentTarget.style.boxShadow = '0 8px 25px rgba(255, 71, 126, 0.6)'; }}
-            onMouseOut={(e) => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = '0 6px 20px rgba(255, 71, 126, 0.5)'; }}
-          >
-            Mulai
-          </button>
-        </Link>
+      {/* Bottom: Level Selection & Mulai Button */}
+      <div style={{ position: 'relative', zIndex: 5, marginTop: '1.5rem', marginBottom: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem', padding: '1rem', backgroundColor: 'rgba(30, 33, 48, 0.7)', backdropFilter: 'blur(10px)', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.1)' }}>
+
+        {attempts >= GAME_SETTINGS.maxAttemptsPerCharacter ? (
+          <div style={{ color: '#ff477e', fontWeight: 'bold', fontSize: '1.1rem', textAlign: 'center', padding: '1rem' }}>
+            🚫 Anda telah mencapai batas maksimal attempt ({GAME_SETTINGS.maxAttemptsPerCharacter} kali) untuk karakter ini.
+          </div>
+        ) : (
+          <>
+            <div style={{ color: 'white', fontWeight: '600', marginBottom: '-0.5rem' }}>
+              Sisa Attempt: <span style={{ color: '#f0944d' }}>{GAME_SETTINGS.maxAttemptsPerCharacter - attempts} / {GAME_SETTINGS.maxAttemptsPerCharacter}</span>
+            </div>
+
+            {/* Difficulty Selection */}
+            <div style={{
+              display: 'flex',
+              gap: '1rem',
+              backgroundColor: 'rgba(255,255,255,0.05)',
+              padding: '8px',
+              borderRadius: '12px',
+              border: '1px solid rgba(255,255,255,0.1)'
+            }}>
+              {(['Easy', 'Medium', 'Hard'] as const).map(lvl => (
+                <button
+                  key={lvl}
+                  onClick={() => setDifficulty(lvl)}
+                  style={{
+                    padding: '8px 24px',
+                    border: 'none',
+                    borderRadius: '8px',
+                    backgroundColor: difficulty === lvl ? '#ff477e' : 'transparent',
+                    color: difficulty === lvl ? 'white' : '#e2e8f0',
+                    fontWeight: '600',
+                    fontSize: '0.9rem',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s',
+                    boxShadow: difficulty === lvl ? '0 4px 12px rgba(255, 71, 126, 0.4)' : 'none'
+                  }}
+                >
+                  {lvl}
+                </button>
+              ))}
+            </div>
+
+            {/* Question Count Input */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+              <label style={{ color: '#a0a5b5', fontSize: '0.9rem', fontWeight: '600' }}>Jumlah Soal:</label>
+              <input
+                type="number"
+                value={questionCount}
+                onChange={(e) => {
+                  const val = e.target.value === '' ? '' : parseInt(e.target.value);
+                  setQuestionCount(val);
+                }}
+                min={1}
+                max={GAME_SETTINGS.questionLimits[difficulty]}
+                style={{
+                  width: '80px',
+                  padding: '8px 12px',
+                  borderRadius: '8px',
+                  border: '1px solid rgba(255,255,255,0.2)',
+                  backgroundColor: 'rgba(255,255,255,0.05)',
+                  color: 'white',
+                  fontSize: '1rem',
+                  outline: 'none',
+                  textAlign: 'center'
+                }}
+              />
+              <span style={{ color: '#a0a5b5', fontSize: '0.8rem' }}>
+                (Maks: {GAME_SETTINGS.questionLimits[difficulty]})
+              </span>
+            </div>
+
+            {/* Mulai Button */}
+            {typeof questionCount === 'number' && questionCount > 0 && questionCount <= GAME_SETTINGS.questionLimits[difficulty] ? (
+              <Link href={`/dialog/${character.id}?level=${difficulty.toLowerCase()}&count=${questionCount}`} style={{ textDecoration: 'none', marginTop: '0.5rem' }}>
+                <button className="btn-primary" style={{ padding: '14px 60px', fontSize: '1.2rem' }}>
+                  Mulai Kuis
+                </button>
+              </Link>
+            ) : (
+              <button disabled style={{
+                padding: '14px 60px', fontSize: '1.2rem', backgroundColor: '#555', color: '#999',
+                border: 'none', borderRadius: '6px', fontWeight: 'bold', cursor: 'not-allowed', marginTop: '0.5rem'
+              }}>
+                Jumlah Soal Tidak Valid
+              </button>
+            )}
+          </>
+        )}
       </div>
 
     </main>

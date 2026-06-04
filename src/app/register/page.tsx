@@ -8,14 +8,25 @@ import BackButton from '../../components/BackButton';
 
 export default function RegisterPage() {
   const router = useRouter();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [gender, setGender] = useState('');
 
-  const handleRegister = () => {
-    if (!gender) {
-      toast.error("Silakan pilih gender terlebih dahulu!");
+  const handleRegister = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email || !password || !gender) {
+      toast.error("Silakan lengkapi email, password, dan gender!");
       return;
     }
-    // Simpan gender pemain untuk menentukan apakah mereka mencari Waifu atau Husbu
+
+    const users = JSON.parse(localStorage.getItem('mock_users') || '[]');
+    if (users.find((u: any) => u.email === email)) {
+      toast.error("Email sudah terdaftar!");
+      return;
+    }
+    
+    users.push({ email, password, gender });
+    localStorage.setItem('mock_users', JSON.stringify(users));
     localStorage.setItem('userGender', gender);
     
     // Set dummy cookie untuk Middleware agar langsung terhitung login
@@ -23,7 +34,7 @@ export default function RegisterPage() {
     
     toast.success("Pendaftaran berhasil! Memasuki permainan...");
     setTimeout(() => {
-      router.push('/dashboard');
+      window.location.href = '/dashboard';
     }, 1000);
   };
 
@@ -54,13 +65,15 @@ export default function RegisterPage() {
             Silahkan daftarkan akun anda
           </p>
 
-          <form style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <form onSubmit={handleRegister} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             <div>
               <label style={{ display: 'block', fontSize: '0.8rem', color: '#64748b', marginBottom: '0.4rem', fontWeight: '500' }}>
                 Email
               </label>
               <input 
                 type="email" 
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 placeholder="Masukan email anda" 
                 style={{
                   width: '100%',
@@ -81,6 +94,8 @@ export default function RegisterPage() {
               </label>
               <input 
                 type="password" 
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 placeholder="Masukan password anda" 
                 style={{
                   width: '100%',
@@ -124,8 +139,7 @@ export default function RegisterPage() {
             </div>
 
             <button 
-              type="button" 
-              onClick={handleRegister}
+              type="submit" 
               style={{
                 width: '100%',
                 padding: '12px',

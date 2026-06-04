@@ -1,0 +1,254 @@
+"use client";
+
+import { useState, use } from 'react';
+import Link from 'next/link';
+
+import BackButton from '../../../../../components/BackButton';
+import { charactersData } from '../../../../../data/mockData';
+
+interface QuestionDraft {
+  id?: string;
+  content: string;
+  level: 'Easy' | 'Medium' | 'Hard';
+  time_limit: number;
+  options: string[];
+  correct_index: number;
+}
+
+export default function EditQuestionsPage({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = use(params);
+  const [questions, setQuestions] = useState<QuestionDraft[]>([
+    {
+      id: 'q1',
+      content: 'Berapakah integral dari 2x?',
+      level: 'Easy',
+      time_limit: 30,
+      options: ['x^2 + C', 'x + C', '2x^2 + C', 'x^2'],
+      correct_index: 0
+    }
+  ]);
+
+  const [activeTab, setActiveTab] = useState(0);
+
+  const handleAddQuestion = () => {
+    setQuestions([...questions, {
+      content: '',
+      level: 'Easy',
+      time_limit: 30,
+      options: ['', '', '', ''],
+      correct_index: 0
+    }]);
+    setActiveTab(questions.length);
+  };
+
+  const handleUpdate = (field: keyof QuestionDraft, value: any) => {
+    const updated = [...questions];
+    updated[activeTab] = { ...updated[activeTab], [field]: value };
+    setQuestions(updated);
+  };
+
+  const handleOptionChange = (idx: number, value: string) => {
+    const updated = [...questions];
+    updated[activeTab].options[idx] = value;
+    setQuestions(updated);
+  };
+
+  const handleDelete = (idx: number) => {
+    const updated = questions.filter((_, i) => i !== idx);
+    setQuestions(updated);
+    setActiveTab(Math.max(0, idx - 1));
+  };
+
+  const activeQ = questions[activeTab];
+  
+  const character = charactersData.find(c => c.id === resolvedParams.id);
+  const characterName = character ? character.name : resolvedParams.id.replace(/-/g, ' ');
+
+  return (
+    <div className="animate-fade-in" style={{ display: 'flex', gap: '2rem', height: '100%' }}>
+
+      {/* Sidebar untuk Daftar Soal */}
+      <div style={{
+        width: '320px',
+        backgroundColor: 'rgba(255,255,255,0.05)',
+        backdropFilter: 'blur(10px)',
+        border: '1px solid rgba(255,255,255,0.1)',
+        borderRadius: '16px',
+        display: 'flex', flexDirection: 'column',
+        overflow: 'hidden'
+      }}>
+        <div style={{ padding: '1.5rem', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+          <BackButton href="/admin/topics" style={{ marginBottom: '1rem' }} />
+          <h2 style={{ color: 'white', fontSize: '1.2rem', margin: 0 }}>Kelola Soal</h2>
+          <div style={{
+            display: 'inline-block',
+            marginTop: '10px',
+            padding: '4px 12px',
+            backgroundColor: 'rgba(240, 148, 77, 0.2)',
+            border: '1px solid rgba(240, 148, 77, 0.4)',
+            borderRadius: '20px',
+            color: '#f0944d',
+            fontSize: '0.85rem',
+            fontWeight: 'bold',
+            textTransform: 'capitalize',
+            maxWidth: '100%',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap'
+          }}>
+            👤 Karakter: {characterName}
+          </div>
+        </div>
+
+        <div style={{ flex: 1, overflowY: 'auto', padding: '1rem' }}>
+          {questions.map((q, idx) => (
+            <div key={idx}
+              onClick={() => setActiveTab(idx)}
+              style={{
+                padding: '12px',
+                backgroundColor: activeTab === idx ? 'rgba(255, 71, 126, 0.2)' : 'rgba(255,255,255,0.03)',
+                border: activeTab === idx ? '1px solid #ff477e' : '1px solid rgba(255,255,255,0.1)',
+                borderRadius: '8px',
+                marginBottom: '10px',
+                cursor: 'pointer',
+                transition: 'all 0.2s'
+              }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                <span style={{ color: 'white', fontWeight: 'bold' }}>Soal {idx + 1}</span>
+                <span style={{ color: '#f0944d', fontSize: '0.8rem' }}>{q.level}</span>
+              </div>
+              <p style={{ color: '#a0a5b5', fontSize: '0.85rem', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                {q.content || 'Kosong...'}
+              </p>
+            </div>
+          ))}
+          <button onClick={handleAddQuestion} style={{
+            width: '100%', padding: '12px', backgroundColor: 'transparent',
+            border: '2px dashed rgba(255,255,255,0.2)', color: 'white', borderRadius: '8px',
+            cursor: 'pointer', fontWeight: 'bold'
+          }}>
+            + Tambah Soal
+          </button>
+        </div>
+      </div>
+
+      {/* Area Utama Editor Soal (Gaya Quizizz) */}
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+        {questions.length > 0 ? (
+          <>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem', gap: '1rem' }}>
+              <button onClick={() => handleDelete(activeTab)} style={{
+                padding: '10px 20px', backgroundColor: 'rgba(239, 68, 68, 0.2)', color: '#ef4444',
+                border: '1px solid #ef4444', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold'
+              }}>Hapus Soal</button>
+              <button onClick={() => alert('Disimpan!')} style={{
+                padding: '10px 20px', backgroundColor: '#22c55e', color: 'white',
+                border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', boxShadow: '0 4px 15px rgba(34, 197, 94, 0.3)'
+              }}>Simpan Semua</button>
+            </div>
+
+            <div style={{
+              backgroundColor: 'rgba(255,255,255,0.05)',
+              backdropFilter: 'blur(10px)',
+              border: '1px solid rgba(255,255,255,0.1)',
+              borderRadius: '16px',
+              padding: '2rem',
+              flex: 1,
+              display: 'flex', flexDirection: 'column', gap: '1.5rem'
+            }}>
+              {/* Toolbar Atas */}
+              <div style={{ display: 'flex', gap: '1rem' }}>
+                <select value={activeQ.level} onChange={(e) => handleUpdate('level', e.target.value)} style={{
+                  padding: '10px 16px', borderRadius: '8px', backgroundColor: 'rgba(0,0,0,0.3)', color: 'white', border: '1px solid rgba(255,255,255,0.2)', outline: 'none'
+                }}>
+                  <option value="Easy">Level: Easy</option>
+                  <option value="Medium">Level: Medium</option>
+                  <option value="Hard">Level: Hard</option>
+                </select>
+                <select value={activeQ.time_limit} onChange={(e) => handleUpdate('time_limit', parseInt(e.target.value))} style={{
+                  padding: '10px 16px', borderRadius: '8px', backgroundColor: 'rgba(0,0,0,0.3)', color: 'white', border: '1px solid rgba(255,255,255,0.2)', outline: 'none'
+                }}>
+                  <option value={10}>10 detik</option>
+                  <option value={20}>20 detik</option>
+                  <option value={30}>30 detik</option>
+                  <option value={45}>45 detik</option>
+                  <option value={60}>60 detik</option>
+                  <option value={120}>120 detik</option>
+                </select>
+              </div>
+
+              {/* Teks Soal */}
+              <div>
+                <textarea
+                  placeholder="Ketik pertanyaan Anda di sini..."
+                  value={activeQ.content}
+                  onChange={(e) => handleUpdate('content', e.target.value)}
+                  style={{
+                    width: '100%', height: '150px', padding: '20px', borderRadius: '12px',
+                    backgroundColor: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.2)',
+                    color: 'white', fontSize: '1.2rem', outline: 'none', resize: 'none', textAlign: 'center'
+                  }}
+                />
+              </div>
+
+              {/* Pilihan Ganda */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', flex: 1 }}>
+                {activeQ.options.map((opt, idx) => {
+                  const colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444'];
+                  const isCorrect = activeQ.correct_index === idx;
+
+                  return (
+                    <div key={idx} style={{
+                      position: 'relative',
+                      display: 'flex', alignItems: 'center',
+                      backgroundColor: colors[idx],
+                      borderRadius: '12px',
+                      padding: '4px',
+                      opacity: isCorrect ? 1 : 0.8,
+                      boxShadow: isCorrect ? `0 0 0 4px white` : 'none',
+                      transition: 'all 0.2s'
+                    }}>
+                      {/* Checkbox Jawaban Benar */}
+                      <div
+                        onClick={() => handleUpdate('correct_index', idx)}
+                        style={{
+                          width: '40px', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          cursor: 'pointer', borderRight: '1px solid rgba(255,255,255,0.2)'
+                        }}
+                        title="Tandai sebagai jawaban benar"
+                      >
+                        <div style={{
+                          width: '24px', height: '24px', borderRadius: '50%',
+                          border: '2px solid white', backgroundColor: isCorrect ? 'white' : 'transparent',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center'
+                        }}>
+                          {isCorrect && <span style={{ color: colors[idx], fontWeight: 'bold', fontSize: '0.9rem' }}>✓</span>}
+                        </div>
+                      </div>
+
+                      {/* Input Jawaban */}
+                      <textarea
+                        value={opt}
+                        onChange={(e) => handleOptionChange(idx, e.target.value)}
+                        placeholder={`Tambahkan opsi jawaban...`}
+                        style={{
+                          flex: 1, height: '100px', padding: '12px 16px',
+                          backgroundColor: 'transparent', border: 'none', color: 'white',
+                          fontSize: '1.1rem', outline: 'none', resize: 'none'
+                        }}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </>
+        ) : (
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#a0a5b5' }}>
+            Belum ada soal. Klik + Tambah Soal.
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
