@@ -7,11 +7,17 @@ import ProfileBadge from '../../components/ProfileBadge';
 
 export default function DashboardPage() {
   const [targetGender, setTargetGender] = useState('cewe'); // cewe = Waifu, cowo = Husbu
+  const [isAdmin, setIsAdmin] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    // Ambil gender pemain dari localStorage (diset saat daftar/login)
+    // Ambil gender dan role pemain dari localStorage (diset saat daftar/login)
     const userGender = localStorage.getItem('userGender');
+    const userRole = localStorage.getItem('userRole');
+    
+    if (userRole === 'admin') {
+      setIsAdmin(true);
+    }
     
     // Jika pemain perempuan, cari Husbu (cowo). Jika laki-laki, cari Waifu (cewe).
     if (userGender === 'FEMALE') {
@@ -67,12 +73,14 @@ export default function DashboardPage() {
             padding: '8px 18px', borderRadius: '20px',
             border: '1px solid rgba(255,255,255,0.2)', transition: 'all 0.2s'
           }}>Leaderboard</Link>
-          <Link href="/admin" style={{ 
-            color: 'white', textDecoration: 'none', fontSize: '0.9rem', fontWeight: '600',
-            backgroundColor: 'rgba(255,255,255,0.1)', backdropFilter: 'blur(10px)',
-            padding: '8px 18px', borderRadius: '20px',
-            border: '1px solid rgba(255,255,255,0.2)', transition: 'all 0.2s'
-          }}>Admin</Link>
+          {isAdmin && (
+            <Link href="/admin" style={{ 
+              color: 'white', textDecoration: 'none', fontSize: '0.9rem', fontWeight: '600',
+              backgroundColor: 'rgba(255,255,255,0.1)', backdropFilter: 'blur(10px)',
+              padding: '8px 18px', borderRadius: '20px',
+              border: '1px solid rgba(255,255,255,0.2)', transition: 'all 0.2s'
+            }}>Admin</Link>
+          )}
         </div>
       </header>
 

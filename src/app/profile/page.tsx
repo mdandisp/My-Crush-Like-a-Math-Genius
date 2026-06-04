@@ -164,7 +164,9 @@ export default function ProfilePage() {
             <button
               onClick={() => {
                 document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-                window.location.href = "/";
+                document.cookie = "role=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+                localStorage.removeItem('userRole');
+                window.location.href = "/login";
               }}
               style={{
                 padding: '6px 16px', backgroundColor: 'transparent', color: '#ef4444',

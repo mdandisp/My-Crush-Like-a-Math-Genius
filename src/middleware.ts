@@ -4,6 +4,7 @@ import type { NextRequest } from 'next/server';
 export function middleware(request: NextRequest) {
   // Ambil token dari cookies (yang nantinya akan diset setelah login dari backend)
   const token = request.cookies.get('token')?.value;
+  const role = request.cookies.get('role')?.value;
 
   // Halaman yang butuh login (dilindungi)
   const protectedRoutes = ['/dashboard', '/admin', '/leaderboard', '/topic', '/quiz'];
@@ -16,6 +17,11 @@ export function middleware(request: NextRequest) {
   if (isProtectedRoute && !token) {
     // Redirect ke halaman login
     return NextResponse.redirect(new URL('/login', request.url));
+  }
+
+  // Jika user mencoba masuk ke halaman admin TAPI bukan admin
+  if (request.nextUrl.pathname.startsWith('/admin') && role !== 'admin') {
+    return NextResponse.redirect(new URL('/dashboard', request.url));
   }
 
   // Jika user SUDAH login tapi mencoba ke halaman login/register
