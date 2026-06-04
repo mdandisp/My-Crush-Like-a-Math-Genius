@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, use } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { charactersData, mockDialogues } from '../../../data/mockData';
 
 export default function DialogPage({ params }: { params: Promise<{ id: string }> }) {
@@ -11,6 +11,10 @@ export default function DialogPage({ params }: { params: Promise<{ id: string }>
   
   const [currentLine, setCurrentLine] = useState(0);
   const [dialogues, setDialogues] = useState<string[]>([]);
+
+  const searchParams = useSearchParams();
+  const level = searchParams.get('level') || 'easy';
+  const count = searchParams.get('count') || '5';
 
   useEffect(() => {
     if (!character) {
@@ -25,12 +29,12 @@ export default function DialogPage({ params }: { params: Promise<{ id: string }>
     if (currentLine < dialogues.length - 1) {
       setCurrentLine(currentLine + 1);
     } else {
-      router.push(`/quiz/${resolvedParams.id}`);
+      router.push(`/quiz/${resolvedParams.id}?level=${level}&count=${count}`);
     }
   };
 
   const handleSkip = () => {
-    router.push(`/quiz/${resolvedParams.id}`);
+    router.push(`/quiz/${resolvedParams.id}?level=${level}&count=${count}`);
   };
 
   if (!character || dialogues.length === 0) return null;

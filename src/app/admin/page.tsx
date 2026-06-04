@@ -71,10 +71,10 @@ export default function AdminHomePage() {
           Petunjuk Penggunaan Panel Admin
         </h2>
         <ul style={{ color: '#ffffffff', lineHeight: '1.8', fontSize: '0.95rem', paddingLeft: '1.5rem' }}>
-          <li><strong>Classrooms:</strong> Buat dan kelola ruang kelas khusus untuk murid. Anda akan mendapatkan kode kelas (*Join Code*).</li>
-          <li><strong>Topics:</strong> Tambahkan karakter waifu/husband baru, lengkapi gambar dan dialog mereka. Atur skor dan batasan *attempt* di sini.</li>
-          <li><strong>Editor Soal (di dalam Topics):</strong> Edit pertanyaan bergaya *Quizizz*, dengan dukungan timer mundur dan kunci jawaban ganda.</li>
-          <li><strong>People:</strong> Pantau siapa saja murid yang telah mendaftar dan memantau status peran (*role*) mereka.</li>
+          <li><strong>Classrooms:</strong> Buat dan kelola ruang kelas khusus untuk murid. Anda akan mendapatkan kode kelas (Join Code).</li>
+          <li><strong>Topics:</strong> Tambahkan karakter waifu/husband baru, lengkapi gambar dan dialog mereka. Atur skor dan batasan (attempt) di sini.</li>
+          <li><strong>Editor Soal (di dalam Topics):</strong> Edit pertanyaan, dengan dukungan timer mundur dan kunci jawaban ganda.</li>
+          <li><strong>People:</strong> Pantau siapa saja murid yang telah mendaftar dan memantau status peran (role) mereka.</li>
           <li><strong>Leaderboard:</strong> Papan peringkat khusus Admin untuk memantau performa murid per kelas.</li>
         </ul>
       </div>

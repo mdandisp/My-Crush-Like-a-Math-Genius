@@ -59,10 +59,10 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
   const requestedCount = parseInt(searchParams.get('count') || '5');
 
   const [currentQ, setCurrentQ] = useState(0);
-  
+
   // Prepare questions array based on requestedCount
   const [activeQuestions, setActiveQuestions] = useState<any[]>([]);
-  
+
   const [selectedAnswers, setSelectedAnswers] = useState<(number | null)[]>([]);
   const [quizState, setQuizState] = useState<'info' | 'playing' | 'finished'>('info');
   const [timeLeft, setTimeLeft] = useState(300); // 5 minutes
@@ -75,8 +75,8 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
     } else {
       // Build questions list by duplicating mockQuestions if necessary
       let qs = [];
-      for(let i=0; i<requestedCount; i++) {
-        qs.push({ ...mockQuestions[i % mockQuestions.length], id: i+1 });
+      for (let i = 0; i < requestedCount; i++) {
+        qs.push({ ...mockQuestions[i % mockQuestions.length], id: i + 1 });
       }
       setActiveQuestions(qs);
       setSelectedAnswers(new Array(requestedCount).fill(null));
@@ -134,7 +134,7 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
     });
     setScore(correct);
     setQuizState('finished');
-    
+
     // Save attempt to localStorage
     const history = JSON.parse(localStorage.getItem('quiz_attempts') || '[]');
     history.push({
@@ -332,7 +332,7 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
                   <p>⚡ Tingkat Kesulitan: <strong style={{ color: 'white', textTransform: 'capitalize' }}>{level}</strong></p>
                   <p>📝 Jumlah Soal: <strong style={{ color: 'white' }}>{totalQ} soal</strong></p>
                   <p>⏱ Waktu: <strong style={{ color: 'white' }}>5 menit</strong></p>
-                  <p>🎯 Tipe: <strong style={{ color: 'white' }}>Pilihan Ganda (Mode Linear)</strong></p>
+                  <p>🎯 Tipe: <strong style={{ color: 'white' }}>Pilihan Ganda</strong></p>
                 </div>
               </div>
 
@@ -451,7 +451,7 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
             }}>
               {/* Trophy Icon */}
               <Link href="/leaderboard" style={{ position: 'absolute', top: '1rem', right: '1rem', textDecoration: 'none' }}>
-                <div 
+                <div
                   className="char-image-hover"
                   style={{
                     width: '50px', height: '50px',
@@ -513,7 +513,7 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
                 </Link>
                 <Link href={`/dashboard`} style={{ textDecoration: 'none' }}>
                   <button className="btn-primary">
-                    Kembali ke Dasbor
+                    Dashboard
                   </button>
                 </Link>
               </div>
