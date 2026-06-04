@@ -233,7 +233,7 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
 
         {/* ====== LEFT COLUMN: Timer + Character Card ====== */}
         <div style={{
-          width: '220px',
+          width: '280px',
           flexShrink: 0,
           display: 'flex',
           flexDirection: 'column',
@@ -282,8 +282,8 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
                 style={{
                   width: '100%',
                   height: '100%',
-                  objectFit: 'contain',
-                  objectPosition: 'bottom'
+                  objectFit: 'cover',
+                  objectPosition: 'top center'
                 }}
               />
             </div>
