@@ -1,10 +1,10 @@
-# 🎮 My Crush Like a Math Genius (Frontend)
+# My Crush Like a Math Genius (Frontend)
 
 Sebuah aplikasi web edukasi berbasis *Visual Novel* untuk pembelajaran Kalkulus. Pemain dapat memilih karakter (Husbu/Waifu) berdasarkan topik kalkulus (Limit, Turunan, Integral), dan mengerjakan soal kuis untuk meningkatkan *affection* (skor) serta bersaing di *Leaderboard*.
 
 ---
 
-## 💻 Tech Stack
+## Tech Stack
 
 - **Framework:** [Next.js](https://nextjs.org/) (App Router)
 - **Library UI:** [React](https://react.dev/)
@@ -14,7 +14,7 @@ Sebuah aplikasi web edukasi berbasis *Visual Novel* untuk pembelajaran Kalkulus.
 
 ---
 
-## ✨ Fitur Utama (Frontend)
+## Fitur Utama (Frontend)
 
 1. **Autentikasi UI (Login & Register)**
 2. **Dashboard & Pemilihan Karakter**
@@ -25,7 +25,7 @@ Sebuah aplikasi web edukasi berbasis *Visual Novel* untuk pembelajaran Kalkulus.
 
 ---
 
-## 🚀 Cara Menjalankan Proyek
+## Cara Menjalankan Proyek
 
 ```bash
 # 1. Install dependensi
@@ -38,8 +38,14 @@ npm run dev
 ```
 
 ---
-
-## 📁 Struktur Folder
+## Login menggunakan akun admin sementara untuk mengakses admin panel:
+1.  Jalankan aplikasi.
+2.  Pada halaman login, masukkan:
+    *   **Email:** `admin@mail.com`
+    *   **Password:** `admin123`
+3.  Klik tombol Login.
+   
+## Struktur Folder
 
 ```
 ├── src/
