@@ -3,21 +3,22 @@ import Link from 'next/link';
 export default function LoadingPage() {
   return (
     <main style={{
-      height: '100vh',
+      height: '100dvh',
       width: '100vw',
       overflow: 'hidden',
-      boxSizing: 'border-box',
       position: 'relative',
-      backgroundImage: 'url("/bg_splash.png")',
-      backgroundSize: '100% auto',
-      backgroundPosition: 'top center',
-      backgroundRepeat: 'no-repeat',
-      backgroundColor: '#0f1015',
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'space-between',
-      padding: '2rem'
+      backgroundColor: '#0f1015'
     }}>
+      {/* Background Image Layer (Scaled to hide cream borders) */}
+      <div className="splash-bg-container" style={{
+        position: 'absolute',
+        top: 0, left: 0, right: 0, bottom: 0,
+        backgroundImage: 'url("/bg_splash.png")',
+        zIndex: 0
+      }}></div>
+
+      {/* Content Layer */}
+      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 5, padding: '2rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
 
       {/* Logo */}
       <div className="animate-fade-in" style={{
@@ -58,6 +59,7 @@ export default function LoadingPage() {
             Ketuk Untuk Mulai
           </p>
         </Link>
+      </div>
       </div>
     </main>
   );

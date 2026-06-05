@@ -66,9 +66,9 @@ export default function ProfilePage() {
 
       <div style={{
         position: 'relative', zIndex: 5, marginTop: '2rem', width: '100%', maxWidth: '800px', padding: '0 2rem',
-        display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap'
+        display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60px'
       }}>
-        <div style={{ flexShrink: 0 }}>
+        <div style={{ position: 'absolute', left: '2rem' }}>
           <BackButton href="/dashboard" />
         </div>
         

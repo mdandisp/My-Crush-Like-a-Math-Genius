@@ -396,3 +396,34 @@ h6 {
     min-height: calc(100vh - 100px) !important;
   }
 }
+
+/* Background Panning Animation for Splash */
+@keyframes panBackground {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.splash-bg-container {
+  background-size: cover;
+  background-position: top center;
+  background-repeat: no-repeat;
+  /* Zoom in 10% to push the cream borders off-screen */
+  transform: scale(1.1);
+}
+
+@media (max-width: 768px) {
+  .splash-bg-container {
+    animation: panBackground 20s ease-in-out infinite;
+    /* Reset scale for mobile since panning already moves the image */
+    transform: scale(1);
+  }
+}
