@@ -20,7 +20,9 @@ export default function EditClassroomPage() {
   return (
     <div className="animate-fade-in" style={{ maxWidth: '700px' }}>
       <div style={{ marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-        <BackButton href="/admin/classrooms" />
+        <div style={{ flexShrink: 0 }}>
+          <BackButton href="/admin/classrooms" />
+        </div>
         <div>
           <h1 style={{ color: 'white', fontSize: '1.8rem', margin: 0 }}>Buat/Edit Classroom</h1>
         </div>

@@ -82,17 +82,18 @@ export default function TopicDetail({ params }: { params: Promise<{ id: string }
       }}></div>
 
       {/* Back button */}
-      <BackButton href="/dashboard" style={{ position: 'absolute', top: '1.5rem', left: '1.5rem', zIndex: 10 }} />
+      <BackButton href="/dashboard" style={{ position: 'absolute', top: '1.5rem', left: '1.5rem', zIndex: 10 }} className="mobile-abs-left" />
 
       {/* Profile Badge - Top Right */}
       <ProfileBadge
         name="Pemain 1"
         size="small"
         style={{ position: 'absolute', top: '1.5rem', right: '1.5rem', zIndex: 10 }}
+        className="mobile-abs-right"
       />
 
       {/* Title Banner - "Pilih Karakter" */}
-      <div style={{
+      <div className="mobile-title-margin" style={{
         position: 'relative',
         zIndex: 5,
         marginTop: '1.5rem',
@@ -113,7 +114,7 @@ export default function TopicDetail({ params }: { params: Promise<{ id: string }
       </div>
 
       {/* Main Card Area */}
-      <div style={{
+      <div className="topic-main-area" style={{
         position: 'relative',
         zIndex: 5,
         marginTop: '1.5rem',
@@ -127,26 +128,22 @@ export default function TopicDetail({ params }: { params: Promise<{ id: string }
       }}>
 
         {/* Center Card */}
-        <div style={{
+        <div className="topic-center-card" style={{
           flex: 1,
-          backgroundColor: 'rgba(255, 255, 255, 0.95)',
-          borderRadius: '16px',
-          overflow: 'hidden',
-          boxShadow: '0 10px 40px rgba(0,0,0,0.3)',
           display: 'flex',
-          minHeight: '420px'
+          minHeight: '420px',
+          gap: '1rem' // Add a little gap between the floating image and the right card
         }}>
 
           {/* Left: Character Image */}
-          <div style={{
+          <div className="topic-left-img" style={{
             width: '45%',
             position: 'relative',
-            backgroundColor: '#e8e0d8',
+            backgroundColor: 'transparent',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            justifyContent: 'flex-end',
-            overflow: 'hidden'
+            justifyContent: 'flex-end'
           }}>
             <img
               src={character.image}
@@ -161,14 +158,6 @@ export default function TopicDetail({ params }: { params: Promise<{ id: string }
                 zIndex: 1
               }}
             />
-            {/* Gradient overlay on character */}
-            <div style={{
-              position: 'absolute',
-              top: 0, left: 0, right: 0, bottom: 0,
-              background: 'linear-gradient(180deg, rgba(30, 20, 40, 0.15) 0%, transparent 30%, transparent 60%, rgba(30, 20, 40, 0.25) 100%)',
-              zIndex: 2,
-              pointerEvents: 'none'
-            }}></div>
             {/* Affection Bar */}
             <div style={{
               position: 'absolute',
@@ -189,10 +178,14 @@ export default function TopicDetail({ params }: { params: Promise<{ id: string }
           </div>
 
           {/* Right: Tabs & Content */}
-          <div style={{
+          <div className="topic-right-content" style={{
             width: '55%',
             display: 'flex',
-            flexDirection: 'column'
+            flexDirection: 'column',
+            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+            borderRadius: '16px',
+            boxShadow: '0 10px 40px rgba(0,0,0,0.3)',
+            overflow: 'hidden'
           }}>
             {/* Tab Buttons */}
             <div style={{ display: 'flex', borderBottom: '2px solid #f0f0f0' }}>

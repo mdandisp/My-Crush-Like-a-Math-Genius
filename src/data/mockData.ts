@@ -17,6 +17,14 @@ export const mockUsers = [
   { id: 'u2', name: 'whitegoose407', email: 'white@mail.com', gender: 'FEMALE', role: 'student' },
   { id: 'u3', name: 'redwolf227', email: 'red@mail.com', gender: 'MALE', role: 'student' },
   { id: 'u4', name: 'Admin1', email: 'admin@mail.com', gender: 'MALE', role: 'admin' },
+  { id: 'u5', name: 'bluetiger12', email: 'blue@mail.com', gender: 'MALE', role: 'student' },
+  { id: 'u6', name: 'pinkrabbit55', email: 'pink@mail.com', gender: 'FEMALE', role: 'student' },
+  { id: 'u7', name: 'greendragon8', email: 'green@mail.com', gender: 'MALE', role: 'student' },
+  { id: 'u8', name: 'yellowbird99', email: 'yellow@mail.com', gender: 'FEMALE', role: 'student' },
+  { id: 'u9', name: 'Admin2', email: 'admin2@mail.com', gender: 'FEMALE', role: 'admin' },
+  { id: 'u10', name: 'silverfox33', email: 'silver@mail.com', gender: 'MALE', role: 'student' },
+  { id: 'u11', name: 'goldenbear7', email: 'golden@mail.com', gender: 'MALE', role: 'student' },
+  { id: 'u12', name: 'purplecat42', email: 'purple@mail.com', gender: 'FEMALE', role: 'student' }
 ];
 
 export const charactersData = [

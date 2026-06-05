@@ -59,6 +59,7 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
   const requestedCount = parseInt(searchParams.get('count') || '5');
 
   const [currentQ, setCurrentQ] = useState(0);
+  const [showCharacterModal, setShowCharacterModal] = useState(false);
 
   // Prepare questions array based on requestedCount
   const [activeQuestions, setActiveQuestions] = useState<any[]>([]);
@@ -155,7 +156,7 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
   const progressPercent = quizState === 'finished' ? 100 : ((currentQ + 1) / totalQ) * 100;
 
   return (
-    <main style={{
+    <main className="mobile-scroll-fix" style={{
       height: '100vh',
       maxHeight: '100vh',
       backgroundImage: 'url("/bg_kelas.png")',
@@ -175,25 +176,75 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
         zIndex: 0
       }}></div>
 
-      {/* ====== TOP: Banner Topik ====== */}
+      {/* ====== TOP: Header Row ====== */}
       <div style={{
         position: 'relative',
-        zIndex: 5,
-        marginTop: '0.8rem',
-        backgroundColor: '#f0944d',
-        padding: '10px 60px',
-        borderRadius: '8px',
-        boxShadow: '0 4px 15px rgba(240, 148, 77, 0.4)'
+        zIndex: 50,
+        width: '100%',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: '1rem',
+        padding: '0 1.5rem'
       }}>
-        <h1 style={{
-          color: 'white',
-          fontSize: '1.5rem',
-          fontWeight: '700',
-          fontStyle: 'italic',
-          textShadow: '0 2px 4px rgba(0,0,0,0.2)'
+        {/* Banner Topik */}
+        <div style={{
+          backgroundColor: '#f0944d',
+          padding: '10px 60px',
+          borderRadius: '8px',
+          boxShadow: '0 4px 15px rgba(240, 148, 77, 0.4)'
         }}>
-          {quizState === 'finished' ? 'Selesai' : character.concept}
-        </h1>
+          <h1 style={{
+            color: 'white',
+            fontSize: '1.5rem',
+            fontWeight: '700',
+            fontStyle: 'italic',
+            margin: 0,
+            textShadow: '0 2px 4px rgba(0,0,0,0.2)'
+          }}>
+            {quizState === 'finished' ? 'Selesai' : character.concept}
+          </h1>
+        </div>
+
+        {/* Top Right Floating Character Button (Info) - Mobile Only */}
+        <button
+          className="mobile-only"
+          onClick={() => setShowCharacterModal(true)}
+          style={{
+            position: 'absolute',
+            right: '1.5rem',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            width: '45px',
+            height: '45px',
+            borderRadius: '50%',
+            backgroundColor: 'rgba(255, 255, 255, 0.1)',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(255,255,255,0.4)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+            transition: 'all 0.2s',
+            color: 'white'
+          }}
+          onMouseOver={(e) => {
+            e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.25)';
+            e.currentTarget.style.transform = 'translateY(-50%) scale(1.1)';
+          }}
+          onMouseOut={(e) => {
+            e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+            e.currentTarget.style.transform = 'translateY(-50%) scale(1)';
+          }}
+          title={`Lihat Detail ${character.name}`}
+        >
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+        </button>
       </div>
 
       {/* ====== Progress Bar (dashed) ====== */}
@@ -218,7 +269,7 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
       </div>
 
       {/* ====== MAIN CONTENT ====== */}
-      <div style={{
+      <div className="quiz-main-content" style={{
         position: 'relative',
         zIndex: 5,
         flex: 1,
@@ -232,16 +283,16 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
       }}>
 
         {/* ====== LEFT COLUMN: Timer + Character Card ====== */}
-        <div style={{
+        <div className="quiz-left-col" style={{
           width: '280px',
           flexShrink: 0,
           display: 'flex',
           flexDirection: 'column',
-          gap: '0.5rem',
+          gap: '1.5rem',
           minHeight: 0
         }}>
           {/* Timer */}
-          <div style={{
+          <div className="quiz-timer-card" style={{
             backgroundColor: '#ff477e',
             padding: '12px 20px',
             borderRadius: '12px',
@@ -258,8 +309,8 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
             </span>
           </div>
 
-          {/* Character Card */}
-          <div style={{
+          {/* Character Card - Desktop Only */}
+          <div className="quiz-character-card desktop-only" style={{
             backgroundColor: 'rgba(255, 255, 255, 0.15)',
             backdropFilter: 'blur(4px)',
             borderRadius: '12px',
@@ -267,7 +318,6 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
             boxShadow: '0 6px 20px rgba(0,0,0,0.2)',
             border: '2px solid rgba(255,255,255,0.25)',
             flex: 1,
-            display: 'flex',
             flexDirection: 'column',
             position: 'relative'
           }}>
@@ -311,9 +361,39 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
           position: 'relative'
         }}>
 
+          {/* Mobile Speech Bubble to fill the gap */}
+          {quizState === 'info' && (
+            <div className="mobile-only animate-fade-in" style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '1rem',
+              backgroundColor: 'rgba(30, 33, 48, 0.6)',
+              backdropFilter: 'blur(10px)',
+              padding: '12px 15px',
+              borderRadius: '12px',
+              border: '1px solid rgba(255, 255, 255, 0.1)'
+            }}>
+              <div style={{
+                width: '50px', height: '50px', borderRadius: '50%',
+                backgroundColor: '#e8e0d8',
+                backgroundImage: `url(${character.image})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'top center',
+                border: '2px solid #f0944d',
+                flexShrink: 0
+              }}></div>
+              <div>
+                <h4 style={{ color: '#f0944d', fontSize: '0.85rem', margin: '0 0 4px 0' }}>{character.name}</h4>
+                <p style={{ color: 'white', fontSize: '0.9rem', margin: 0, fontStyle: 'italic' }}>
+                  "Ayo mulai kuisnya! Aku yakin kamu bisa."
+                </p>
+              </div>
+            </div>
+          )}
+
           {/* === INFO STATE === */}
           {quizState === 'info' && (
-            <div className="animate-fade-in" style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+            <div className="animate-fade-in quiz-info-state-container" style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
               {/* Info Card */}
               <div style={{
                 backgroundColor: 'rgba(30, 33, 48, 0.85)',
@@ -357,19 +437,19 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
           {quizState === 'playing' && (
             <div className="animate-fade-in" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
               {/* Question & Answers Card (Main Glass Container) */}
-              <div style={{
+              <div className="quiz-question-container" style={{
                 backgroundColor: 'rgba(30, 33, 48, 0.85)',
                 backdropFilter: 'blur(10px)',
                 borderRadius: '16px',
                 padding: '1.5rem 2rem',
                 border: '1px solid rgba(255,255,255,0.1)'
               }}>
-                <h3 style={{ color: 'white', fontSize: '1rem', fontWeight: 'bold', marginBottom: '1rem', textAlign: 'center' }}>
+                <h3 className="quiz-question-title" style={{ color: 'white', fontSize: '1rem', fontWeight: 'bold', marginBottom: '1rem', textAlign: 'center' }}>
                   Soal Nomor {currentQ + 1}
                 </h3>
 
                 {/* Question Box (Cyan Border) */}
-                <div style={{
+                <div className="quiz-question-box" style={{
                   backgroundColor: '#e5e7eb', // Light gray background like mockup
                   border: '4px solid #00bfff', // Cyan border
                   padding: '2rem',
@@ -379,13 +459,13 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
                   justifyContent: 'center',
                   marginBottom: '1.5rem'
                 }}>
-                  <p style={{ color: '#333', fontSize: '1.2rem', fontWeight: '600', textAlign: 'center' }}>
+                  <p className="quiz-question-text" style={{ color: '#333', fontSize: '1.2rem', fontWeight: '600', textAlign: 'center' }}>
                     {activeQuestions[currentQ].question}
                   </p>
                 </div>
 
                 {/* Answer Options */}
-                <div style={{
+                <div className="quiz-options-wrapper" style={{
                   display: 'flex',
                   gap: '12px',
                   flexWrap: 'nowrap',
@@ -394,6 +474,7 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
                   {activeQuestions[currentQ].options.map((opt: string, i: number) => (
                     <button
                       key={i}
+                      className="quiz-option-btn"
                       onClick={() => selectAnswer(i)}
                       style={{
                         flex: 1,
@@ -523,6 +604,69 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
         </div>
 
       </div>
+
+      {/* Character Modal */}
+      {showCharacterModal && (
+        <div
+          onClick={() => setShowCharacterModal(false)}
+          className="animate-fade-in"
+          style={{
+            position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+            backgroundColor: 'rgba(15, 16, 21, 0.85)',
+            backdropFilter: 'blur(10px)',
+            zIndex: 100,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '2rem'
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              backgroundColor: 'rgba(255,255,255,0.1)',
+              border: '2px solid rgba(255,255,255,0.2)',
+              borderRadius: '20px',
+              padding: '2rem',
+              maxWidth: '400px',
+              width: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              boxShadow: '0 20px 50px rgba(0,0,0,0.5)',
+              position: 'relative'
+            }}
+          >
+            <button
+              onClick={() => setShowCharacterModal(false)}
+              style={{
+                position: 'absolute', top: '15px', right: '15px',
+                background: 'rgba(255,255,255,0.2)', border: 'none',
+                color: 'white', width: '30px', height: '30px',
+                borderRadius: '50%', cursor: 'pointer', fontWeight: 'bold'
+              }}
+            >
+              ✕
+            </button>
+            <h2 style={{ color: 'white', marginBottom: '1.5rem', textAlign: 'center' }}>{character.name}</h2>
+
+            <div style={{ width: '100%', height: '400px', backgroundColor: 'transparent', borderRadius: '12px', overflow: 'hidden', position: 'relative', marginBottom: '1.5rem' }}>
+              <img
+                src={character.image}
+                alt={character.name}
+                style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'center' }}
+              />
+            </div>
+
+            <div style={{ width: '100%', backgroundColor: 'rgba(0,0,0,0.3)', borderRadius: '10px', padding: '15px', textAlign: 'center' }}>
+              <p style={{ color: '#a0a5b5', margin: '0 0 10px 0', fontSize: '0.9rem' }}>Affection</p>
+              <div style={{ width: '100%', height: '10px', backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: '5px', overflow: 'hidden' }}>
+                <div style={{ width: '30%', height: '100%', background: 'linear-gradient(90deg, #ff477e, #ff6b9d)' }}></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
     </main>
   );

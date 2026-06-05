@@ -6,16 +6,16 @@ import { mockClassrooms } from '../../../data/mockData';
 export default function AdminClassroomsPage() {
   return (
     <div className="animate-fade-in">
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+      <div className="admin-page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
           <h1 style={{ color: 'white', fontSize: '2rem', marginBottom: '0.5rem', fontWeight: '700' }}>
             Manajemen Classroom
           </h1>
           <p style={{ color: '#a0a5b5', fontSize: '1rem' }}>
-            Kelola ruang kelas, lihat daftar murid, dan bagikan *Join Code*.
+            Kelola ruang kelas, lihat daftar murid, dan bagikan kode kelas (Join Code).
           </p>
         </div>
-        
+
         <Link href="/admin/classrooms/edit" style={{ textDecoration: 'none' }}>
           <button style={{
             padding: '12px 24px',
@@ -29,9 +29,9 @@ export default function AdminClassroomsPage() {
             boxShadow: '0 4px 14px rgba(255, 71, 126, 0.4)',
             transition: 'all 0.2s'
           }}
-          onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
-          onMouseOut={(e) => e.currentTarget.style.transform = 'translateY(0)'}>
-            + Buat Classroom
+            onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+            onMouseOut={(e) => e.currentTarget.style.transform = 'translateY(0)'}>
+            Buat Classroom
           </button>
         </Link>
       </div>
@@ -47,16 +47,16 @@ export default function AdminClassroomsPage() {
             transition: 'transform 0.2s, boxShadow 0.2s',
             cursor: 'default'
           }}
-          onMouseOver={(e) => {
-            e.currentTarget.style.transform = 'translateY(-4px)';
-            e.currentTarget.style.boxShadow = '0 10px 25px rgba(0,0,0,0.3)';
-          }}
-          onMouseOut={(e) => {
-            e.currentTarget.style.transform = 'translateY(0)';
-            e.currentTarget.style.boxShadow = 'none';
-          }}>
+            onMouseOver={(e) => {
+              e.currentTarget.style.transform = 'translateY(-4px)';
+              e.currentTarget.style.boxShadow = '0 10px 25px rgba(0,0,0,0.3)';
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = 'none';
+            }}>
             <h3 style={{ color: 'white', fontSize: '1.3rem', marginBottom: '12px' }}>{cls.name}</h3>
-            
+
             <div style={{ backgroundColor: 'rgba(0,0,0,0.2)', padding: '8px 12px', borderRadius: '8px', marginBottom: '1rem' }}>
               <p style={{ color: '#a0a5b5', fontSize: '0.8rem', margin: 0 }}>Join Code:</p>
               <p style={{ color: '#f0944d', fontSize: '1.2rem', margin: 0, fontWeight: 'bold', letterSpacing: '2px' }}>
@@ -70,7 +70,7 @@ export default function AdminClassroomsPage() {
             <p style={{ color: '#a0a5b5', fontSize: '0.9rem', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
               <span style={{ fontSize: '1.2rem' }}>👥</span> Murid: <strong style={{ color: 'white' }}>{cls.students} siswa</strong>
             </p>
-            
+
             <div style={{ display: 'flex', gap: '10px' }}>
               <Link href={`/admin/classrooms/edit?id=${cls.id}`} style={{ flex: 1, textDecoration: 'none' }}>
                 <button style={{
@@ -84,8 +84,8 @@ export default function AdminClassroomsPage() {
                   cursor: 'pointer',
                   transition: 'all 0.2s'
                 }}
-                onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)'}
-                onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
+                  onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)'}
+                  onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
                   Edit
                 </button>
               </Link>
@@ -101,8 +101,8 @@ export default function AdminClassroomsPage() {
                   cursor: 'pointer',
                   transition: 'all 0.2s'
                 }}
-                onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'rgba(34, 197, 94, 0.3)'}
-                onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'rgba(34, 197, 94, 0.2)'}>
+                  onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'rgba(34, 197, 94, 0.3)'}
+                  onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'rgba(34, 197, 94, 0.2)'}>
                   Leaderboard
                 </button>
               </Link>

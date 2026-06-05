@@ -70,7 +70,7 @@ export default function DialogPage({ params }: { params: Promise<{ id: string }>
       <img 
         src={character.image} 
         alt={character.name} 
-        className="animate-fade-in"
+        className="animate-fade-in dialog-char-img"
         style={{
           position: 'absolute',
           top: '5%',
@@ -85,7 +85,7 @@ export default function DialogPage({ params }: { params: Promise<{ id: string }>
       />
 
       {/* Dialog Box Area */}
-      <div style={{
+      <div className="dialog-box-area" style={{
         position: 'absolute',
         bottom: '2rem',
         left: '50%',
@@ -109,7 +109,7 @@ export default function DialogPage({ params }: { params: Promise<{ id: string }>
         </div>
         
         {/* Text Box */}
-        <div style={{
+        <div className="dialog-text-box" style={{
           backgroundColor: 'rgba(30, 33, 48, 0.85)',
           backdropFilter: 'blur(10px)',
           border: '2px solid rgba(255, 255, 255, 0.2)',
@@ -121,7 +121,7 @@ export default function DialogPage({ params }: { params: Promise<{ id: string }>
           flexDirection: 'column',
           justifyContent: 'center'
         }}>
-          <p className="animate-fade-in" key={currentLine} style={{
+          <p className="animate-fade-in dialog-text" key={currentLine} style={{
             color: 'white',
             fontSize: '1.4rem',
             lineHeight: '1.6',

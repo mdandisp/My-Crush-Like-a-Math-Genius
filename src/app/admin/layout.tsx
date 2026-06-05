@@ -24,10 +24,10 @@ export default function AdminLayout({
         pointerEvents: 'none'
       }}></div>
 
-      <div style={{ zIndex: 1, display: 'flex', width: '100%' }}>
+      <div className="admin-layout-wrapper" style={{ zIndex: 1, display: 'flex', width: '100%' }}>
         <AdminSidebar />
         
-        <main style={{ flex: 1, padding: '2rem', height: '100vh', overflowY: 'auto' }}>
+        <main className="admin-main-content" style={{ flex: 1, padding: '2rem', height: '100vh', overflowY: 'auto' }}>
           {children}
         </main>
       </div>

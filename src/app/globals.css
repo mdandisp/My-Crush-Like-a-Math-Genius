@@ -1,20 +1,24 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;600;800&display=swap');
 
 :root {
-  --primary-color: #ff477e; /* A vibrant pink/red for the romantic "crush" theme */
+  --primary-color: #ff477e;
+  /* A vibrant pink/red for the romantic "crush" theme */
   --primary-hover: #ff2a6d;
-  --secondary-color: #38b000; /* For correct answers/success */
-  --error-color: #ff0054; /* For wrong answers */
-  --bg-dark: #0f1015; /* Deep dark background */
+  --secondary-color: #38b000;
+  /* For correct answers/success */
+  --error-color: #ff0054;
+  /* For wrong answers */
+  --bg-dark: #0f1015;
+  /* Deep dark background */
   --bg-gradient: linear-gradient(135deg, #13141c 0%, #1c1e2b 100%);
   --text-primary: #ffffff;
   --text-secondary: #a0a5b5;
-  
+
   /* Glassmorphism Variables */
   --glass-bg: rgba(20, 22, 35, 0.65);
   --glass-border: rgba(255, 255, 255, 0.08);
   --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
-  
+
   --font-body: 'Inter', system-ui, sans-serif;
   --font-heading: 'Outfit', system-ui, sans-serif;
   --transition-speed: 0.3s;
@@ -36,7 +40,12 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: var(--font-heading);
   font-weight: 700;
   letter-spacing: 0.5px;
@@ -56,7 +65,7 @@ h1, h2, h3, h4, h5, h6 {
   background: rgba(30, 33, 48, 0.6);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255,255,255,0.05);
+  border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 16px;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
@@ -145,10 +154,31 @@ h1, h2, h3, h4, h5, h6 {
   align-items: center;
 }
 
+.mobile-burger-btn {
+  display: none;
+}
+
+.mobile-only {
+  display: none !important;
+}
+
+.desktop-only {
+  display: flex !important;
+}
+
+
+
 /* Animations */
 @keyframes fadeInScale {
-  0% { opacity: 0; transform: scale(0.95) translateY(10px); }
-  100% { opacity: 1; transform: scale(1) translateY(0); }
+  0% {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
 
 .animate-fade-in {
@@ -156,8 +186,17 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.6; transform: scale(0.98); }
+
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.6;
+    transform: scale(0.98);
+  }
 }
 
 .animate-pulse {
@@ -170,4 +209,190 @@ h1, h2, h3, h4, h5, h6 {
 
 .char-card-hover:hover .char-image-hover {
   transform: translateX(-50%) scale(1.05) !important;
+}
+
+/* ========================================= */
+/* Responsive Mobile Styles                  */
+/* ========================================= */
+@media (max-width: 768px) {
+
+  /* General */
+  .mobile-scroll-fix {
+    height: auto !important;
+    max-height: none !important;
+    overflow-y: auto !important;
+    min-height: 100vh !important;
+  }
+
+  .mobile-only {
+    display: flex !important;
+  }
+
+  .desktop-only {
+    display: none !important;
+  }
+
+  /* Topic Detail Page */
+  .topic-main-area {
+    flex-direction: column !important;
+    padding: 0 1rem !important;
+  }
+
+  .topic-center-card {
+    flex-direction: column !important;
+    min-height: auto !important;
+  }
+
+  .topic-left-img,
+  .topic-right-content {
+    width: 100% !important;
+  }
+
+  .topic-left-img {
+    height: 250px !important;
+  }
+
+  /* Quiz Page */
+  .quiz-main-content {
+    flex-direction: column !important;
+    padding: 0.8rem 1rem !important;
+    overflow-y: auto !important;
+  }
+
+  .quiz-left-col {
+    width: 100% !important;
+    flex-direction: column !important;
+    height: auto !important;
+  }
+
+  .quiz-timer-card {
+    flex: none !important;
+    width: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 10px 15px !important;
+  }
+
+  .quiz-timer-card span {
+    font-size: 1.5rem !important;
+  }
+
+  .quiz-question-container {
+    padding: 1rem 1rem !important;
+  }
+
+  .quiz-question-title {
+    margin-bottom: 0.5rem !important;
+  }
+
+  .quiz-question-box {
+    min-height: 80px !important;
+    padding: 1rem !important;
+    margin-bottom: 1rem !important;
+  }
+
+  .quiz-question-text {
+    font-size: 1rem !important;
+  }
+
+  .quiz-character-card {
+    flex: none !important;
+    width: 100% !important;
+    height: 200px !important;
+  }
+
+  .quiz-info-state-container {
+    justify-content: flex-start !important;
+    padding-top: 1rem !important;
+  }
+
+  .quiz-character-card img {
+    object-fit: contain !important;
+    object-position: center !important;
+  }
+
+  .quiz-options-wrapper {
+    flex-direction: column !important;
+  }
+
+  .quiz-option-btn {
+    min-height: 70px !important;
+    font-size: 0.9rem !important;
+  }
+
+  /* Dashboard Page */
+  .dashboard-char-list {
+    flex-direction: column !important;
+    align-items: center !important;
+  }
+
+  .mobile-dashboard-header {
+    top: 1rem !important;
+    left: 1rem !important;
+    right: 1rem !important;
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    gap: 0 !important;
+  }
+
+  .desktop-nav {
+    display: none !important;
+  }
+
+  .mobile-burger-btn {
+    display: block !important;
+  }
+
+  .mobile-dashboard-title {
+    padding-top: 6rem !important;
+    margin-bottom: 2rem !important;
+  }
+
+  /* Overlaps Fix for Topic Detail */
+  .mobile-title-margin {
+    margin-top: 5rem !important;
+    padding: 10px 20px !important;
+    text-align: center;
+  }
+
+  .mobile-abs-left {
+    top: 1rem !important;
+    left: 1rem !important;
+  }
+
+  .mobile-abs-right {
+    top: 1rem !important;
+    right: 1rem !important;
+  }
+
+  /* Dialog Page Fixes */
+  .dialog-box-area {
+    width: 95% !important;
+    bottom: 1rem !important;
+  }
+
+  .dialog-text-box {
+    padding: 1.5rem !important;
+    min-height: 120px !important;
+  }
+
+  .dialog-text {
+    font-size: 1.1rem !important;
+  }
+
+  .dialog-char-img {
+    transform: translateX(-47%) !important;
+  }
+
+  /* Admin Dashboard Fixes */
+  .admin-layout-wrapper {
+    flex-direction: column !important;
+  }
+
+  .admin-main-content {
+    padding: 1rem !important;
+    height: auto !important;
+    min-height: calc(100vh - 100px) !important;
+  }
 }
