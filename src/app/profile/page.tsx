@@ -64,22 +64,28 @@ export default function ProfilePage() {
         zIndex: 0
       }}></div>
 
-      <BackButton href="/dashboard" style={{ position: 'absolute', top: '1.5rem', left: '1.5rem', zIndex: 10 }} />
-
-      {/* Banner */}
       <div style={{
-        position: 'relative', zIndex: 5, marginTop: '2rem',
-        backgroundColor: '#ff477e',
-        padding: '10px 50px',
-        borderRadius: '8px',
-        boxShadow: '0 4px 15px rgba(255, 71, 126, 0.4)'
+        position: 'relative', zIndex: 5, marginTop: '2rem', width: '100%', maxWidth: '800px', padding: '0 2rem',
+        display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap'
       }}>
-        <h1 style={{
-          color: 'white', fontSize: '1.5rem', fontWeight: '700',
-          fontStyle: 'italic', textShadow: '0 2px 4px rgba(0,0,0,0.2)'
+        <div style={{ flexShrink: 0 }}>
+          <BackButton href="/dashboard" />
+        </div>
+        
+        {/* Banner */}
+        <div style={{
+          backgroundColor: '#ff477e',
+          padding: '10px 30px',
+          borderRadius: '8px',
+          boxShadow: '0 4px 15px rgba(255, 71, 126, 0.4)'
         }}>
-          Profil Pemain
-        </h1>
+          <h1 style={{
+            color: 'white', fontSize: '1.5rem', fontWeight: '700', margin: 0,
+            fontStyle: 'italic', textShadow: '0 2px 4px rgba(0,0,0,0.2)'
+          }}>
+            Profil Pemain
+          </h1>
+        </div>
       </div>
 
       <div style={{
@@ -91,8 +97,8 @@ export default function ProfilePage() {
         gap: '2rem'
       }}>
         {/* User Info Card */}
-        <div className="glass-card animate-fade-in" style={{ padding: '2rem', display: 'flex', alignItems: 'center', gap: '2rem' }}>
-          <div style={{ position: 'relative', flexShrink: 0 }}>
+        <div className="glass-card animate-fade-in" style={{ padding: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem', textAlign: 'center' }}>
+          <div style={{ position: 'relative' }}>
             <input 
               type="file" 
               accept="image/*" 
@@ -118,8 +124,8 @@ export default function ProfilePage() {
               </div>
             </div>
           </div>
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '0.5rem' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', marginBottom: '0.5rem', flexWrap: 'wrap' }}>
               {isEditingName ? (
                 <div style={{ display: 'flex', gap: '8px' }}>
                   <input
@@ -160,7 +166,7 @@ export default function ProfilePage() {
                 </>
               )}
             </div>
-            <p style={{ color: '#a0a5b5', fontSize: '1rem', marginBottom: '1rem' }}>Level: 1 | Role : Pelajar Kalkulus</p>
+            <p style={{ color: '#a0a5b5', fontSize: '1rem', marginBottom: '1.5rem', wordBreak: 'break-word', textAlign: 'center' }}>Level: 1 | Role : Pelajar Kalkulus</p>
             <button
               onClick={() => {
                 document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";

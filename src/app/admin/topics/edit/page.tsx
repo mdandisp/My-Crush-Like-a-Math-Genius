@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import BackButton from '../../../../components/BackButton';
+import { charactersData } from '../../../../data/mockData';
 
 export default function EditTopicPage() {
   const [formData, setFormData] = useState({
@@ -21,6 +22,23 @@ export default function EditTopicPage() {
       hard: { plus: 500, minus: 100 }
     }
   });
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get('id');
+    if (id) {
+      const char = charactersData.find(c => c.id === id);
+      if (char) {
+        setFormData(prev => ({
+          ...prev,
+          title: char.name,
+          description: char.info || '',
+          normal_image_female: char.type === 'cewe' ? char.image : '',
+          normal_image_male: char.type === 'cowo' ? char.image : '',
+        }));
+      }
+    }
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -60,7 +78,9 @@ export default function EditTopicPage() {
   return (
     <div className="animate-fade-in" style={{ maxWidth: '900px' }}>
       <div style={{ marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-        <BackButton href="/admin/topics" />
+        <div style={{ flexShrink: 0 }}>
+          <BackButton href="/admin/topics" />
+        </div>
         <div>
           <h1 style={{ color: 'white', fontSize: '1.8rem', margin: 0 }}>Buat/Edit Karakter (Topik)</h1>
         </div>
@@ -88,12 +108,12 @@ export default function EditTopicPage() {
         {/* Normal State */}
         <div style={sectionStyle}>
           <h2 style={{ color: '#f0944d', fontSize: '1.2rem', margin: '0 0 10px 0' }}>Kondisi Normal (Belum Jadian)</h2>
-          <div style={{ display: 'flex', gap: '1rem' }}>
-            <div style={{ flex: 1 }}>
+          <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+            <div style={{ flex: 1, minWidth: '250px' }}>
               <label style={{ display: 'block', color: '#a0a5b5', marginBottom: '8px', fontWeight: '600' }}>Gambar Normal (Cewek) URL</label>
               <input type="url" style={inputStyle} value={formData.normal_image_female} onChange={(e) => setFormData({ ...formData, normal_image_female: e.target.value })} />
             </div>
-            <div style={{ flex: 1 }}>
+            <div style={{ flex: 1, minWidth: '250px' }}>
               <label style={{ display: 'block', color: '#a0a5b5', marginBottom: '8px', fontWeight: '600' }}>Gambar Normal (Cowok) URL</label>
               <input type="url" style={inputStyle} value={formData.normal_image_male} onChange={(e) => setFormData({ ...formData, normal_image_male: e.target.value })} />
             </div>
@@ -107,12 +127,12 @@ export default function EditTopicPage() {
         {/* Dating State */}
         <div style={sectionStyle}>
           <h2 style={{ color: '#ec4899', fontSize: '1.2rem', margin: '0 0 10px 0' }}>Kondisi Dating (Sudah Jadian)</h2>
-          <div style={{ display: 'flex', gap: '1rem' }}>
-            <div style={{ flex: 1 }}>
+          <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+            <div style={{ flex: 1, minWidth: '250px' }}>
               <label style={{ display: 'block', color: '#a0a5b5', marginBottom: '8px', fontWeight: '600' }}>Gambar Dating (Cewek) URL</label>
               <input type="url" style={inputStyle} value={formData.dating_image_female} onChange={(e) => setFormData({ ...formData, dating_image_female: e.target.value })} />
             </div>
-            <div style={{ flex: 1 }}>
+            <div style={{ flex: 1, minWidth: '250px' }}>
               <label style={{ display: 'block', color: '#a0a5b5', marginBottom: '8px', fontWeight: '600' }}>Gambar Dating (Cowok) URL</label>
               <input type="url" style={inputStyle} value={formData.dating_image_male} onChange={(e) => setFormData({ ...formData, dating_image_male: e.target.value })} />
             </div>
@@ -127,15 +147,17 @@ export default function EditTopicPage() {
         <div style={sectionStyle}>
           <h2 style={{ color: '#22c55e', fontSize: '1.2rem', margin: '0 0 10px 0' }}>Pengaturan Skor per Level</h2>
           {(['easy', 'medium', 'hard'] as const).map(lvl => (
-            <div key={lvl} style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '0.5rem' }}>
-              <div style={{ width: '80px', color: 'white', fontWeight: '600', textTransform: 'capitalize' }}>{lvl}</div>
-              <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <span style={{ color: '#22c55e' }}>+ Benar:</span>
-                <input type="number" style={{ ...inputStyle, width: '100px' }} value={formData.level_settings[lvl].plus} onChange={(e) => handleLevelChange(lvl, 'plus', e.target.value)} />
-              </div>
-              <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <span style={{ color: '#ef4444' }}>- Salah:</span>
-                <input type="number" style={{ ...inputStyle, width: '100px' }} value={formData.level_settings[lvl].minus} onChange={(e) => handleLevelChange(lvl, 'minus', e.target.value)} />
+            <div key={lvl} style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1rem' }}>
+              <div style={{ color: 'white', fontWeight: '600', textTransform: 'capitalize', fontSize: '1.1rem' }}>{lvl}</div>
+              <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', width: '100%' }}>
+                <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ color: '#22c55e', minWidth: '60px', fontSize: '0.9rem', fontWeight: '600' }}>+ Benar:</span>
+                  <input type="number" style={{ ...inputStyle, width: '100%' }} value={formData.level_settings[lvl].plus} onChange={(e) => handleLevelChange(lvl, 'plus', e.target.value)} />
+                </div>
+                <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ color: '#ef4444', minWidth: '60px', fontSize: '0.9rem', fontWeight: '600' }}>- Salah:</span>
+                  <input type="number" style={{ ...inputStyle, width: '100%' }} value={formData.level_settings[lvl].minus} onChange={(e) => handleLevelChange(lvl, 'minus', e.target.value)} />
+                </div>
               </div>
             </div>
           ))}

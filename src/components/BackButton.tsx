@@ -3,11 +3,12 @@ import Link from 'next/link';
 interface BackButtonProps {
   href?: string;
   style?: React.CSSProperties;
+  className?: string;
 }
 
-export default function BackButton({ href = "/", style }: BackButtonProps) {
+export default function BackButton({ href = "/", style, className }: BackButtonProps) {
   return (
-    <Link href={href} style={{
+    <Link href={href} className={className} style={{
       color: 'white', 
       textDecoration: 'none', 
       display: 'inline-flex',

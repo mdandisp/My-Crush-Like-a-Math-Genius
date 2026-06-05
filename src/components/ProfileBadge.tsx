@@ -8,9 +8,10 @@ interface ProfileBadgeProps {
   level?: number;
   size?: 'small' | 'medium';
   style?: React.CSSProperties;
+  className?: string;
 }
 
-export default function ProfileBadge({ name = "Pemain 1", level, size = 'medium', style }: ProfileBadgeProps) {
+export default function ProfileBadge({ name = "Pemain 1", level, size = 'medium', style, className }: ProfileBadgeProps) {
   const isSmall = size === 'small';
   const [displayName, setDisplayName] = useState(name);
   const [avatarUrl, setAvatarUrl] = useState('/char-mc.png');
@@ -21,17 +22,17 @@ export default function ProfileBadge({ name = "Pemain 1", level, size = 'medium'
     const savedAvatar = localStorage.getItem('userAvatar');
     if (savedAvatar) setAvatarUrl(savedAvatar);
   }, []);
-  
+
   return (
-    <Link href="/profile" style={{ textDecoration: 'none', ...style }}>
-      <div 
+    <Link href="/profile" style={{ textDecoration: 'none', display: 'inline-block', ...style }} className={className}>
+      <div
         className="profile-badge-hover"
-        style={{ 
-          display: 'flex', 
-          alignItems: 'center', 
-          backgroundColor: 'rgba(255, 255, 255, 0.15)', 
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          backgroundColor: 'rgba(255, 255, 255, 0.15)',
           backdropFilter: 'blur(10px)',
-          padding: isSmall ? '8px 16px 8px 8px' : '10px 20px 10px 10px', 
+          padding: isSmall ? '8px 16px 8px 8px' : '10px 20px 10px 10px',
           borderRadius: '50px',
           border: '1px solid rgba(255, 255, 255, 0.2)',
           cursor: 'pointer',
@@ -49,10 +50,10 @@ export default function ProfileBadge({ name = "Pemain 1", level, size = 'medium'
           e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.2)';
         }}
       >
-        <div style={{ 
-          width: isSmall ? '40px' : '50px', 
-          height: isSmall ? '40px' : '50px', 
-          borderRadius: '50%', 
+        <div style={{
+          width: isSmall ? '40px' : '50px',
+          height: isSmall ? '40px' : '50px',
+          borderRadius: '50%',
           backgroundColor: '#ccc',
           backgroundImage: `url("${avatarUrl}")`,
           backgroundSize: 'cover',
