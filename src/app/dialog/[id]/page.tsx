@@ -1,13 +1,18 @@
 "use client";
 
-import { useState, useEffect, use } from 'react';
+import { useState, useEffect, use, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { charactersData, mockDialogues } from '../../../data/mockData';
 
-export default function DialogPage({ params }: { params: Promise<{ id: string }> }) {
+import { mapTopicsToCharacters } from '../../../utils/characterMapper';
+import { fetchApi } from '../../../utils/api';
+import DialogBox from '../../../components/dialog/DialogBox';
+import { Character } from '../../../types';
+
+function DialogContent({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
   const resolvedParams = use(params);
-  const character = charactersData.find(c => c.id === resolvedParams.id);
+  const [character, setCharacter] = useState<Character | null>(null);
   
   const [currentLine, setCurrentLine] = useState(0);
   const [dialogues, setDialogues] = useState<string[]>([]);
@@ -17,13 +22,32 @@ export default function DialogPage({ params }: { params: Promise<{ id: string }>
   const count = searchParams.get('count') || '5';
 
   useEffect(() => {
-    if (!character) {
-      router.push('/dashboard');
-      return;
-    }
-    const lines = mockDialogues[character.id] || ["Mari kita mulai kuisnya!"];
-    setDialogues(lines);
-  }, [character, router]);
+    const loadDialogData = async () => {
+      try {
+        const userGender = localStorage.getItem('userGender');
+        const targetType = (userGender && userGender.toLowerCase() === 'female') ? 'cowo' : 'cewe';
+
+        const res = await fetchApi('/api/v1/topics');
+        if (res && res.data) {
+          const mapped = mapTopicsToCharacters(res.data, targetType);
+          const found = mapped.find(c => c.topicId === resolvedParams.id);
+          
+          if (found) {
+            setCharacter(found);
+            const lines = mockDialogues[found.id] || ["Mari kita mulai kuisnya!"];
+            setDialogues(lines);
+          } else {
+            router.push('/dashboard');
+          }
+        }
+      } catch (err) {
+        console.error(err);
+        router.push('/dashboard');
+      }
+    };
+
+    loadDialogData();
+  }, [resolvedParams.id, router]);
 
   const handleNext = () => {
     if (currentLine < dialogues.length - 1) {
@@ -41,6 +65,7 @@ export default function DialogPage({ params }: { params: Promise<{ id: string }>
 
   return (
     <main 
+      className="dialog-main"
       onClick={handleNext}
       style={{ 
       height: '100vh', 
@@ -85,58 +110,19 @@ export default function DialogPage({ params }: { params: Promise<{ id: string }>
       />
 
       {/* Dialog Box Area */}
-      <div className="dialog-box-area" style={{
-        position: 'absolute',
-        bottom: '2rem',
-        left: '50%',
-        transform: 'translateX(-50%)',
-        width: '90%',
-        maxWidth: '1000px',
-        zIndex: 10
-      }}>
-        {/* Name Plate */}
-        <div style={{
-          display: 'inline-block',
-          backgroundColor: '#ff477e',
-          color: 'white',
-          padding: '8px 24px',
-          borderRadius: '12px 12px 0 0',
-          fontSize: '1.2rem',
-          fontWeight: 'bold',
-          boxShadow: '0 -4px 10px rgba(0,0,0,0.2)'
-        }}>
-          {character.name}
-        </div>
-        
-        {/* Text Box */}
-        <div className="dialog-text-box" style={{
-          backgroundColor: 'rgba(30, 33, 48, 0.85)',
-          backdropFilter: 'blur(10px)',
-          border: '2px solid rgba(255, 255, 255, 0.2)',
-          borderRadius: '0 12px 12px 12px',
-          padding: '2rem',
-          minHeight: '150px',
-          boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center'
-        }}>
-          <p className="animate-fade-in dialog-text" key={currentLine} style={{
-            color: 'white',
-            fontSize: '1.4rem',
-            lineHeight: '1.6',
-            margin: 0,
-            textShadow: '0 2px 4px rgba(0,0,0,0.3)'
-          }}>
-            {dialogues[currentLine]}
-          </p>
-          <div style={{ textAlign: 'right', marginTop: '10px' }}>
-            <span style={{ color: '#a0a5b5', fontSize: '0.9rem' }}>
-              Klik layar untuk lanjut ▶
-            </span>
-          </div>
-        </div>
-      </div>
+      <DialogBox 
+        characterName={character.name} 
+        dialogueText={dialogues[currentLine]} 
+        currentLine={currentLine} 
+      />
     </main>
+  );
+}
+
+export default function DialogPage({ params }: { params: Promise<{ id: string }> }) {
+  return (
+    <Suspense fallback={<div style={{ minHeight: '100vh', backgroundColor: '#0f1015', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white' }}>Memuat Dialog...</div>}>
+      <DialogContent params={params} />
+    </Suspense>
   );
 }

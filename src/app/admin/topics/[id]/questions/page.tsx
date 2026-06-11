@@ -1,40 +1,87 @@
 "use client";
 
-import { useState, use } from 'react';
+import { useState, use, useEffect } from 'react';
 import Link from 'next/link';
-
+import { fetchApi } from '../../../../../utils/api';
 import BackButton from '../../../../../components/BackButton';
-import { charactersData } from '../../../../../data/mockData';
+import toast from 'react-hot-toast';
 
 interface QuestionDraft {
   id?: string;
   content: string;
   level: 'Easy' | 'Medium' | 'Hard';
-  time_limit: number;
+  timeLimit: number;
   options: string[];
   correct_index: number;
 }
 
 export default function EditQuestionsPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
-  const [questions, setQuestions] = useState<QuestionDraft[]>([
-    {
-      id: 'q1',
-      content: 'Berapakah integral dari 2x?',
-      level: 'Easy',
-      time_limit: 30,
-      options: ['x^2 + C', 'x + C', '2x^2 + C', 'x^2'],
-      correct_index: 0
-    }
-  ]);
-
+  const [questions, setQuestions] = useState<QuestionDraft[]>([]);
   const [activeTab, setActiveTab] = useState(0);
+  const [topicName, setTopicName] = useState<string>('');
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        // Fetch Topic Name
+        const topicRes = await fetchApi(`/api/v1/topics/${resolvedParams.id}`);
+        if (topicRes.data) {
+          setTopicName(topicRes.data.name || '');
+        }
+
+        // Fetch existing questions
+        const qRes = await fetchApi(`/api/v1/questions?topicId=${resolvedParams.id}`);
+        const existingQuestions = qRes.data || [];
+        
+        const mappedQuestions: QuestionDraft[] = existingQuestions.map((q: any) => {
+          let correctIdx = 0;
+          const opts = q.options?.map((opt: any, idx: number) => {
+            if (opt.is_correct) correctIdx = idx;
+            return opt.content;
+          }) || ['', '', '', ''];
+          
+          // Ensure we have 4 options
+          while (opts.length < 4) opts.push('');
+
+          return {
+            id: q.id,
+            content: q.content,
+            level: (q.level ? q.level.charAt(0).toUpperCase() + q.level.slice(1).toLowerCase() : 'Easy') as 'Easy'|'Medium'|'Hard',
+            timeLimit: q.time_limit || 30,
+            options: opts,
+            correct_index: correctIdx
+          };
+        });
+
+        if (mappedQuestions.length > 0) {
+          setQuestions(mappedQuestions);
+        } else {
+          setQuestions([{
+            content: '',
+            level: 'Easy',
+            timeLimit: 30,
+            options: ['', '', '', ''],
+            correct_index: 0
+          }]);
+        }
+
+      } catch (err: any) {
+        toast.error('Gagal memuat data: ' + err.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchData();
+  }, [resolvedParams.id]);
 
   const handleAddQuestion = () => {
     setQuestions([...questions, {
       content: '',
       level: 'Easy',
-      time_limit: 30,
+      timeLimit: 30,
       options: ['', '', '', ''],
       correct_index: 0
     }]);
@@ -59,10 +106,52 @@ export default function EditQuestionsPage({ params }: { params: Promise<{ id: st
     setActiveTab(Math.max(0, idx - 1));
   };
 
+  const handleSaveAll = async () => {
+    setIsLoading(true);
+    try {
+      // Group by level since the API expects batch per level
+      const grouped = {
+        Easy: questions.filter(q => q.level === 'Easy'),
+        Medium: questions.filter(q => q.level === 'Medium'),
+        Hard: questions.filter(q => q.level === 'Hard')
+      };
+
+      for (const [level, qList] of Object.entries(grouped)) {
+        if (qList.length === 0) continue;
+
+        const payload = {
+          topicId: resolvedParams.id,
+          level: level.toLowerCase(),
+          questions: qList.map(q => ({
+            content: q.content,
+            timeLimit: q.timeLimit,
+            options: q.options.map((opt, idx) => ({
+              content: opt || 'Opsi Kosong',
+              isCorrect: idx === q.correct_index
+            }))
+          }))
+        };
+
+        await fetchApi('/api/v1/questions/batch', {
+          method: 'POST',
+          body: JSON.stringify(payload)
+        });
+      }
+      
+      toast.success('Berhasil menyimpan semua soal!');
+    } catch (err: any) {
+      toast.error('Gagal menyimpan soal: ' + err.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const activeQ = questions[activeTab];
-  
-  const character = charactersData.find(c => c.id === resolvedParams.id);
-  const characterName = character ? character.name : resolvedParams.id.replace(/-/g, ' ');
+  const characterName = topicName || resolvedParams.id.replace(/-/g, ' ');
+
+  if (isLoading && questions.length === 0) {
+    return <div style={{ color: 'white', padding: '2rem' }}>Memuat...</div>;
+  }
 
   return (
     <div className="animate-fade-in" style={{ display: 'flex', gap: '2rem', height: '100%' }}>
@@ -96,7 +185,7 @@ export default function EditQuestionsPage({ params }: { params: Promise<{ id: st
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap'
           }}>
-            👤 Karakter: {characterName}
+            📚 Topik: {characterName}
           </div>
         </div>
 
@@ -122,10 +211,10 @@ export default function EditQuestionsPage({ params }: { params: Promise<{ id: st
               </p>
             </div>
           ))}
-          <button onClick={handleAddQuestion} style={{
+          <button onClick={handleAddQuestion} disabled={isLoading} style={{
             width: '100%', padding: '12px', backgroundColor: 'transparent',
             border: '2px dashed rgba(255,255,255,0.2)', color: 'white', borderRadius: '8px',
-            cursor: 'pointer', fontWeight: 'bold'
+            cursor: isLoading ? 'not-allowed' : 'pointer', fontWeight: 'bold', opacity: isLoading ? 0.5 : 1
           }}>
             + Tambah Soal
           </button>
@@ -134,17 +223,17 @@ export default function EditQuestionsPage({ params }: { params: Promise<{ id: st
 
       {/* Area Utama Editor Soal (Gaya Quizizz) */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-        {questions.length > 0 ? (
+        {questions.length > 0 && activeQ ? (
           <>
             <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem', gap: '1rem' }}>
-              <button onClick={() => handleDelete(activeTab)} style={{
+              <button onClick={() => handleDelete(activeTab)} disabled={isLoading} style={{
                 padding: '10px 20px', backgroundColor: 'rgba(239, 68, 68, 0.2)', color: '#ef4444',
-                border: '1px solid #ef4444', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold'
+                border: '1px solid #ef4444', borderRadius: '8px', cursor: isLoading ? 'not-allowed' : 'pointer', fontWeight: 'bold', opacity: isLoading ? 0.5 : 1
               }}>Hapus Soal</button>
-              <button onClick={() => alert('Disimpan!')} style={{
-                padding: '10px 20px', backgroundColor: '#22c55e', color: 'white',
-                border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', boxShadow: '0 4px 15px rgba(34, 197, 94, 0.3)'
-              }}>Simpan Semua</button>
+              <button onClick={handleSaveAll} disabled={isLoading} style={{
+                padding: '10px 20px', backgroundColor: isLoading ? '#a0a5b5' : '#22c55e', color: 'white',
+                border: 'none', borderRadius: '8px', cursor: isLoading ? 'not-allowed' : 'pointer', fontWeight: 'bold', boxShadow: isLoading ? 'none' : '0 4px 15px rgba(34, 197, 94, 0.3)'
+              }}>{isLoading ? 'Menyimpan...' : 'Simpan Semua'}</button>
             </div>
 
             <div style={{
@@ -158,14 +247,14 @@ export default function EditQuestionsPage({ params }: { params: Promise<{ id: st
             }}>
               {/* Toolbar Atas */}
               <div style={{ display: 'flex', gap: '1rem' }}>
-                <select value={activeQ.level} onChange={(e) => handleUpdate('level', e.target.value)} style={{
+                <select value={activeQ.level} onChange={(e) => handleUpdate('level', e.target.value)} disabled={isLoading} style={{
                   padding: '10px 16px', borderRadius: '8px', backgroundColor: 'rgba(0,0,0,0.3)', color: 'white', border: '1px solid rgba(255,255,255,0.2)', outline: 'none'
                 }}>
                   <option value="Easy">Level: Easy</option>
                   <option value="Medium">Level: Medium</option>
                   <option value="Hard">Level: Hard</option>
                 </select>
-                <select value={activeQ.time_limit} onChange={(e) => handleUpdate('time_limit', parseInt(e.target.value))} style={{
+                <select value={activeQ.timeLimit} onChange={(e) => handleUpdate('timeLimit', parseInt(e.target.value))} disabled={isLoading} style={{
                   padding: '10px 16px', borderRadius: '8px', backgroundColor: 'rgba(0,0,0,0.3)', color: 'white', border: '1px solid rgba(255,255,255,0.2)', outline: 'none'
                 }}>
                   <option value={10}>10 detik</option>
@@ -183,6 +272,7 @@ export default function EditQuestionsPage({ params }: { params: Promise<{ id: st
                   placeholder="Ketik pertanyaan Anda di sini..."
                   value={activeQ.content}
                   onChange={(e) => handleUpdate('content', e.target.value)}
+                  disabled={isLoading}
                   style={{
                     width: '100%', height: '150px', padding: '20px', borderRadius: '12px',
                     backgroundColor: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.2)',
@@ -210,10 +300,10 @@ export default function EditQuestionsPage({ params }: { params: Promise<{ id: st
                     }}>
                       {/* Checkbox Jawaban Benar */}
                       <div
-                        onClick={() => handleUpdate('correct_index', idx)}
+                        onClick={() => !isLoading && handleUpdate('correct_index', idx)}
                         style={{
                           width: '40px', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          cursor: 'pointer', borderRight: '1px solid rgba(255,255,255,0.2)'
+                          cursor: isLoading ? 'not-allowed' : 'pointer', borderRight: '1px solid rgba(255,255,255,0.2)'
                         }}
                         title="Tandai sebagai jawaban benar"
                       >
@@ -230,6 +320,7 @@ export default function EditQuestionsPage({ params }: { params: Promise<{ id: st
                       <textarea
                         value={opt}
                         onChange={(e) => handleOptionChange(idx, e.target.value)}
+                        disabled={isLoading}
                         placeholder={`Tambahkan opsi jawaban...`}
                         style={{
                           flex: 1, height: '100px', padding: '12px 16px',
