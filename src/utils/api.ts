@@ -52,7 +52,7 @@ export async function fetchApi(endpoint: string, options: RequestInit = {}) {
   if (!response.ok) {
     throw {
       status: response.status,
-      message: data?.message || 'Something went wrong',
+      message: data?.message || `Error ${response.status}: ${response.statusText}`,
       data: data?.data
     };
   }
