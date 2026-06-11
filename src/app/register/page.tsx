@@ -4,165 +4,150 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
-import BackButton from '../../components/BackButton';
+import AuthLayout from '../../components/auth/AuthLayout';
+import TextInput from '../../components/auth/TextInput';
+import SelectInput from '../../components/auth/SelectInput';
 
 export default function RegisterPage() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [gender, setGender] = useState('');
+  const [username, setUsername] = useState('');
+  const [firstName, setFirstName] = useState('');
 
-  const handleRegister = (e: React.FormEvent) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !password || !gender) {
-      toast.error("Silakan lengkapi email, password, dan gender!");
+    if (!email || !password || !gender || !username || !firstName) {
+      toast.error("Silakan lengkapi semua kolom pendaftaran!");
       return;
     }
 
-    const users = JSON.parse(localStorage.getItem('mock_users') || '[]');
-    if (users.find((u: any) => u.email === email)) {
-      toast.error("Email sudah terdaftar!");
-      return;
+    setIsSubmitting(true);
+
+    try {
+      const payload = {
+        email: email,
+        password: password,
+        gender: gender.toLowerCase(),
+        username: username,
+        first_name: firstName,
+      };
+
+      const registerReq = fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/api/v1/authentication/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      }).then(async (res) => {
+        const data = await res.json();
+        if (!res.ok) {
+          let detailMsg = '';
+          if (data.data) {
+            detailMsg = typeof data.data === 'object' ? JSON.stringify(data.data) : data.data;
+          } else {
+            detailMsg = data.message || JSON.stringify(data);
+          }
+          throw new Error(`Error: ${detailMsg}`);
+        }
+        return data.data;
+      });
+
+      await toast.promise(registerReq, {
+        loading: 'Mendaftarkan akun...',
+        success: 'Pendaftaran berhasil! Silakan masuk.',
+        error: (err) => err.message || 'Terjadi kesalahan'
+      });
+
+      // Redirect to login page after successful registration
+      setTimeout(() => {
+        router.push('/login');
+      }, 1500);
+
+    } catch (error) {
+      // Error handled by toast.promise
+    } finally {
+      setIsSubmitting(false);
     }
-    
-    users.push({ email, password, gender });
-    localStorage.setItem('mock_users', JSON.stringify(users));
-    localStorage.setItem('userGender', gender);
-    
-    // Set dummy cookie untuk Middleware agar langsung terhitung login
-    document.cookie = "token=dummy-token; path=/";
-    
-    toast.success("Pendaftaran berhasil! Memasuki permainan...");
-    setTimeout(() => {
-      window.location.href = '/dashboard';
-    }, 1000);
   };
 
-  return (
-    <main style={{ 
-      minHeight: '100vh', 
-      backgroundImage: 'url("/bg_kelas.png")',
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'center',
-      alignItems: 'center',
-      padding: '2rem'
-    }}>
-      
-      <div className="animate-fade-in" style={{ width: '100%', maxWidth: '400px' }}>
-        <BackButton href="/" style={{ marginBottom: '10px' }} />
+    <AuthLayout
+      title="Mendaftar"
+      subtitle="Silahkan daftarkan akun anda"
+      footerText="Sudah punya akun?"
+      footerLinkText="Masuk"
+      footerLinkHref="/login"
+    >
+      <form onSubmit={handleRegister} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        <TextInput 
+          label="Nama Depan (First Name)"
+          type="text"
+          value={firstName}
+          onChange={(e) => setFirstName(e.target.value)}
+          placeholder="Masukkan nama depan anda"
+          disabled={isSubmitting}
+        />
+        
+        <TextInput 
+          label="Username"
+          type="text"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          placeholder="Masukkan username anda"
+          disabled={isSubmitting}
+        />
 
-        <div style={{
-          backgroundColor: 'white',
-          borderRadius: '16px',
-          padding: '2.5rem',
-          boxShadow: '0 10px 25px rgba(0,0,0,0.2)'
-        }}>
-          <h2 style={{ color: '#ff477e', fontSize: '1.8rem', marginBottom: '0.2rem' }}>Mendaftar</h2>
-          <p style={{ color: '#94a3b8', fontSize: '0.9rem', marginBottom: '1.5rem' }}>
-            Silahkan daftarkan akun anda
-          </p>
+        <TextInput 
+          label="Email"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="Masukkan email anda"
+          disabled={isSubmitting}
+        />
 
-          <form onSubmit={handleRegister} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            <div>
-              <label style={{ display: 'block', fontSize: '0.8rem', color: '#64748b', marginBottom: '0.4rem', fontWeight: '500' }}>
-                Email
-              </label>
-              <input 
-                type="email" 
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Masukan email anda" 
-                style={{
-                  width: '100%',
-                  padding: '12px 16px',
-                  backgroundColor: '#f1f5f9',
-                  border: 'none',
-                  borderRadius: '8px',
-                  outline: 'none',
-                  color: '#334155',
-                  fontSize: '0.9rem'
-                }}
-              />
-            </div>
+        <TextInput 
+          label="Password"
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="Masukkan password anda"
+          disabled={isSubmitting}
+        />
 
-            <div>
-              <label style={{ display: 'block', fontSize: '0.8rem', color: '#64748b', marginBottom: '0.4rem', fontWeight: '500' }}>
-                Password
-              </label>
-              <input 
-                type="password" 
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Masukan password anda" 
-                style={{
-                  width: '100%',
-                  padding: '12px 16px',
-                  backgroundColor: '#f1f5f9',
-                  border: 'none',
-                  borderRadius: '8px',
-                  outline: 'none',
-                  color: '#334155',
-                  fontSize: '0.9rem'
-                }}
-              />
-            </div>
+        <SelectInput 
+          label="Gender"
+          value={gender}
+          onChange={(e) => setGender(e.target.value)}
+          disabled={isSubmitting}
+          placeholder="Pilih gender anda"
+          options={[
+            { label: 'Laki-laki', value: 'male' },
+            { label: 'Perempuan', value: 'female' }
+          ]}
+        />
 
-            <div>
-              <label style={{ display: 'block', fontSize: '0.8rem', color: '#64748b', marginBottom: '0.4rem', fontWeight: '500' }}>
-                Gender
-              </label>
-              <select 
-                value={gender}
-                onChange={(e) => setGender(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '12px 16px',
-                  backgroundColor: '#f1f5f9',
-                  border: 'none',
-                  borderRadius: '8px',
-                  outline: 'none',
-                  color: '#334155',
-                  fontSize: '0.9rem',
-                  appearance: 'none',
-                  backgroundImage: 'url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23334155%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E")',
-                  backgroundRepeat: 'no-repeat',
-                  backgroundPosition: 'right 16px center',
-                  backgroundSize: '12px auto'
-                }}>
-                <option value="">Pilih gender anda</option>
-                <option value="MALE">Laki-laki</option>
-                <option value="FEMALE">Perempuan</option>
-              </select>
-            </div>
-
-            <button 
-              type="submit" 
-              style={{
-                width: '100%',
-                padding: '12px',
-                backgroundColor: '#ff477e',
-                color: 'white',
-                border: 'none',
-                borderRadius: '8px',
-                fontWeight: '600',
-                fontSize: '1rem',
-                marginTop: '1rem',
-                cursor: 'pointer',
-                boxShadow: '0 4px 14px rgba(255, 71, 126, 0.4)'
-              }}
-            >
-              Daftar
-            </button>
-          </form>
-
-          <div style={{ textAlign: 'center', marginTop: '1.5rem', fontSize: '0.85rem', color: '#64748b' }}>
-            Sudah punya akun? <Link href="/login" style={{ color: '#ff477e', textDecoration: 'none', fontWeight: '600' }}>Masuk</Link>
-          </div>
-        </div>
-      </div>
-    </main>
+        <button 
+          type="submit" 
+          disabled={isSubmitting}
+          style={{
+            width: '100%',
+            padding: '12px',
+            backgroundColor: isSubmitting ? '#a0a5b5' : '#ff477e',
+            color: 'white',
+            border: 'none',
+            borderRadius: '8px',
+            fontWeight: '600',
+            fontSize: '1rem',
+            marginTop: '1rem',
+            cursor: isSubmitting ? 'not-allowed' : 'pointer',
+            boxShadow: isSubmitting ? 'none' : '0 4px 14px rgba(255, 71, 126, 0.4)'
+          }}
+        >
+          {isSubmitting ? 'Mendaftarkan...' : 'Daftar'}
+        </button>
+      </form>
+    </AuthLayout>
   );
 }

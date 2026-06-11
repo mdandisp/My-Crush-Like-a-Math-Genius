@@ -8,6 +8,8 @@ import { charactersData, mockRanking, GAME_SETTINGS } from '../../../data/mockDa
 import { getRankBadgeColor } from '../../../utils/helpers';
 import BackButton from '../../../components/BackButton';
 import ProfileBadge from '../../../components/ProfileBadge';
+import { fetchApi } from '../../../utils/api';
+import { mapTopicsToCharacters } from '../../../utils/characterMapper';
 
 export default function TopicDetail({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
@@ -21,33 +23,48 @@ export default function TopicDetail({ params }: { params: Promise<{ id: string }
   const [attempts, setAttempts] = useState(0);
 
   useEffect(() => {
-    // Filter characters based on user gender
-    const userGender = localStorage.getItem('userGender');
-    const targetType = userGender === 'FEMALE' ? 'cowo' : 'cewe';
+    const loadTopicAndCharacter = async () => {
+      // 1. Ambil target gender
+      const userGender = localStorage.getItem('userGender');
+      const targetType = (userGender && userGender.toLowerCase() === 'female') ? 'cowo' : 'cewe';
 
-    // Get all characters of the target type
-    const allChars = [
-      { id: 'lin-yu', type: 'cowo' }, { id: 'sato-shun', type: 'cowo' }, { id: 'deryck', type: 'cowo' },
-      { id: 'mei-lian', type: 'cewe' }, { id: 'kisaragi-rei', type: 'cewe' }, { id: 'scarlett-hayes', type: 'cewe' }
-    ];
-    const filtered = allChars.filter(c => c.type === targetType).map(c => charactersData.find(ch => ch.id === c.id)!);
-    setDisplayedChars(filtered);
+      try {
+        // 2. Fetch Topics from Backend
+        const res = await fetchApi('/api/v1/topics');
+        if (res.data) {
+          // 3. Map Topics to Characters
+          const mapped = mapTopicsToCharacters(res.data, targetType);
+          setDisplayedChars(mapped);
 
-    const idx = filtered.findIndex(c => c.id === resolvedParams.id);
-    if (idx !== -1) {
-      setCharIndex(idx);
-      setCharacter(filtered[idx]);
-    } else if (filtered.length > 0) {
-      setCharIndex(0);
-      setCharacter(filtered[0]);
-    } else {
-      router.push('/dashboard');
-    }
+          // 4. Temukan karakter yang sesuai dengan UUID topik di URL
+          const found = mapped.find(c => c.topicId === resolvedParams.id);
+          if (found) {
+            setCharacter(found);
 
-    // Load attempts history
-    const history = JSON.parse(localStorage.getItem('quiz_attempts') || '[]');
-    const charAttempts = history.filter((h: any) => h.characterId === resolvedParams.id);
-    setAttempts(charAttempts.length);
+            // 5. Load attempts history from backend
+            try {
+              const attemptRes = await fetchApi(`/api/v1/topics/${resolvedParams.id}/attempts/info`);
+              if (attemptRes && attemptRes.data) {
+                setAttempts(attemptRes.data.current_attempts || 0);
+              }
+            } catch (error) {
+              setAttempts(0);
+            }
+
+          } else {
+            // Jika topic tidak ditemukan, kembali ke dashboard
+            router.push('/dashboard');
+          }
+        } else {
+          router.push('/dashboard');
+        }
+      } catch (error) {
+        console.error("Gagal memuat topik:", error);
+        router.push('/dashboard');
+      }
+    };
+
+    loadTopicAndCharacter();
   }, [resolvedParams.id, router]);
 
   // Adjust question count if it exceeds new difficulty max

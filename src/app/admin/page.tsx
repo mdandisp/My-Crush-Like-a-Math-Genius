@@ -1,6 +1,7 @@
 "use client";
 
 import { mockQuestions, mockClassrooms, mockUsers, charactersData } from '../../data/mockData';
+import StatCard from '../../components/admin/StatCard';
 
 export default function AdminHomePage() {
   return (
@@ -27,36 +28,13 @@ export default function AdminHomePage() {
           { label: 'Total Questions', count: mockQuestions.length, icon: '📝', color: '#22c55e' },
           { label: 'Total Users', count: mockUsers.length, icon: '👥', color: '#3b82f6' }
         ].map((stat, idx) => (
-          <div key={idx} style={{
-            backgroundColor: 'rgba(255, 255, 255, 0.05)',
-            backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
-            borderRadius: '16px',
-            padding: '1.5rem',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '1rem',
-            boxShadow: '0 4px 15px rgba(0,0,0,0.2)'
-          }}>
-            <div style={{
-              width: '60px', height: '60px',
-              borderRadius: '12px',
-              backgroundColor: 'rgba(255, 255, 255, 0.1)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: '2rem',
-              color: stat.color
-            }}>
-              {stat.icon}
-            </div>
-            <div>
-              <p style={{ color: '#a0a5b5', fontSize: '0.9rem', marginBottom: '4px', fontWeight: '500' }}>
-                {stat.label}
-              </p>
-              <h2 style={{ color: 'white', fontSize: '1.8rem', margin: 0 }}>
-                {stat.count}
-              </h2>
-            </div>
-          </div>
+          <StatCard 
+            key={idx} 
+            label={stat.label} 
+            count={stat.count} 
+            icon={stat.icon} 
+            color={stat.color} 
+          />
         ))}
       </div>
 
