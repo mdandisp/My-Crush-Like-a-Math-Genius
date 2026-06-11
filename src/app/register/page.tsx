@@ -7,6 +7,7 @@ import toast from 'react-hot-toast';
 import AuthLayout from '../../components/auth/AuthLayout';
 import TextInput from '../../components/auth/TextInput';
 import SelectInput from '../../components/auth/SelectInput';
+import { fetchApi } from '../../utils/api';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -36,22 +37,19 @@ export default function RegisterPage() {
         first_name: firstName,
       };
 
-      const registerReq = fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/api/v1/authentication/register`, {
+      const registerReq = fetchApi('/api/v1/authentication/register', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
-      }).then(async (res) => {
-        const data = await res.json();
-        if (!res.ok) {
-          let detailMsg = '';
-          if (data.data) {
-            detailMsg = typeof data.data === 'object' ? JSON.stringify(data.data) : data.data;
-          } else {
-            detailMsg = data.message || JSON.stringify(data);
-          }
-          throw new Error(`Error: ${detailMsg}`);
-        }
+      }).then((data) => {
         return data.data;
+      }).catch((err) => {
+        let detailMsg = '';
+        if (err.data) {
+          detailMsg = typeof err.data === 'object' ? JSON.stringify(err.data) : err.data;
+        } else {
+          detailMsg = err.message || JSON.stringify(err);
+        }
+        throw new Error(`Error: ${detailMsg}`);
       });
 
       await toast.promise(registerReq, {
