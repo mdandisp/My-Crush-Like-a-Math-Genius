@@ -8,8 +8,6 @@ import { fetchApi } from '../../utils/api';
 import { mapTopicsToCharacters } from '../../utils/characterMapper';
 import DashboardHeader from '../../components/dashboard/DashboardHeader';
 import CharacterCard from '../../components/dashboard/CharacterCard';
-import { fetchApi } from '../../utils/api';
-import { mapTopicsToCharacters } from '../../utils/characterMapper';
 import { Character } from '../../types';
 
 export default function DashboardPage() {

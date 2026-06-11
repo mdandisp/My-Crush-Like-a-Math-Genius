@@ -399,7 +399,7 @@ function QuizContent({ params }: { params: Promise<{ id: string }> }) {
                     <p>📚 Topik: <strong style={{ color: 'white' }}>{character.concept}</strong></p>
                     <p>⚡ Tingkat Kesulitan: <strong style={{ color: 'white', textTransform: 'capitalize' }}>{level}</strong></p>
                     <p>📝 Jumlah Soal: <strong style={{ color: 'white' }}>{totalQ} soal</strong></p>
-                    <p>🔄 Sisa Percobaan: <strong style={{ color: topicInfo?.remaining_attempts > 0 ? '#2ecc71' : '#ff477e' }}>{topicInfo?.remaining_attempts} kali</strong></p>
+                    <p style={{ margin: '5px 0' }}>🔄 Sisa Percobaan: <strong style={{ color: (topicInfo?.remaining_attempts ?? 0) > 0 ? '#2ecc71' : '#ff477e' }}>{topicInfo?.remaining_attempts ?? '-'} kali</strong></p>
                     <p>🎯 Tipe: <strong style={{ color: 'white' }}>Pilihan Ganda</strong></p>
                   </div>
                 )}
