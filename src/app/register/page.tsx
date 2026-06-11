@@ -72,6 +72,7 @@ export default function RegisterPage() {
     }
   };
 
+  return (
     <AuthLayout
       title="Mendaftar"
       subtitle="Silahkan daftarkan akun anda"
