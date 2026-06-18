@@ -57,7 +57,10 @@ export default function AdminClassroomsPage() {
           </p>
         </div>
 
-        <Link href="/admin/classrooms/edit" style={{ textDecoration: "none" }}>
+        <Link
+          href="/admin/classrooms/create"
+          style={{ textDecoration: "none" }}
+        >
           <button
             style={{
               padding: "12px 24px",

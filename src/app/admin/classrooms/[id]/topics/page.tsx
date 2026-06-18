@@ -2,10 +2,10 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import BackButton from "../../../../components/BackButton";
-import { fetchApi } from "../../../../utils/api";
+import BackButton from "../../../../../components/BackButton";
+import { fetchApi } from "../../../../../utils/api";
 
-export default function EditClassroomPage() {
+export default function CreateClassroomPage() {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -78,7 +78,7 @@ export default function EditClassroomPage() {
         </div>
         <div>
           <h1 style={{ color: "white", fontSize: "1.8rem", margin: 0 }}>
-            Buat/Edit Classroom
+            Buat Classroom
           </h1>
         </div>
       </div>
