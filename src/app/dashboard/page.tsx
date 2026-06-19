@@ -2,21 +2,15 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { charactersData } from "../../data/mockData";
 import ProfileBadge from "../../components/ProfileBadge";
 import { fetchApi } from "../../utils/api";
-import { mapTopicsToCharacters } from "../../utils/characterMapper";
 import DashboardHeader from "../../components/dashboard/DashboardHeader";
-import CharacterCard from "../../components/dashboard/CharacterCard";
-import { Character } from "../../types";
-import ClassroomCard from "../../components/admin/ClassroomCard";
 import JoinLayout from "../../components/dashboard/ClassroomJoinCard";
 import TextInput from "../../components/auth/TextInput";
 import { useRouter } from "next/navigation";
 
 export default function ClassroomPage() {
   const [isAdmin, setIsAdmin] = useState(false);
-  const [classrooms, setClassrooms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);

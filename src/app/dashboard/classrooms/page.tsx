@@ -2,13 +2,8 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { charactersData } from "../../../data/mockData";
-import ProfileBadge from "../../../components/ProfileBadge";
 import { fetchApi } from "../../../utils/api";
-import { mapTopicsToCharacters } from "../../../utils/characterMapper";
 import DashboardHeader from "../../../components/dashboard/DashboardHeader";
-import CharacterCard from "../../../components/dashboard/CharacterCard";
-import { Character } from "../../../types";
 import ClassroomCard from "../../../components/admin/ClassroomCard";
 
 export default function ClassroomPage() {
@@ -32,7 +27,7 @@ export default function ClassroomPage() {
       }
     };
 
-    const userRole = localStorage.getItem("data.roles");
+    const userRole = localStorage.getItem("userRole");
 
     if (
       userRole === "admin" ||
@@ -42,7 +37,7 @@ export default function ClassroomPage() {
       setIsAdmin(true);
     }
 
-    console.log("userRole:", userRole);
+    if (userRole) setUserRole(userRole);
 
     fetchClassrooms();
   }, []);
