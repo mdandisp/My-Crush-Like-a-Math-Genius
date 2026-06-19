@@ -1,110 +1,173 @@
 "use client";
 
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { charactersData } from '../../data/mockData';
-import ProfileBadge from '../../components/ProfileBadge';
-import { fetchApi } from '../../utils/api';
-import { mapTopicsToCharacters } from '../../utils/characterMapper';
-import DashboardHeader from '../../components/dashboard/DashboardHeader';
-import CharacterCard from '../../components/dashboard/CharacterCard';
-import { Character } from '../../types';
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { charactersData } from "../../data/mockData";
+import ProfileBadge from "../../components/ProfileBadge";
+import { fetchApi } from "../../utils/api";
+import { mapTopicsToCharacters } from "../../utils/characterMapper";
+import DashboardHeader from "../../components/dashboard/DashboardHeader";
+import CharacterCard from "../../components/dashboard/CharacterCard";
+import { Character } from "../../types";
+import ClassroomCard from "../../components/admin/ClassroomCard";
+import JoinLayout from "../../components/dashboard/ClassroomJoinCard";
+import TextInput from "../../components/auth/TextInput";
+import { useRouter } from "next/navigation";
 
-export default function DashboardPage() {
-  const [targetGender, setTargetGender] = useState<'cewe' | 'cowo'>('cewe'); // cewe = Waifu, cowo = Husbu
+export default function ClassroomPage() {
   const [isAdmin, setIsAdmin] = useState(false);
+  const [classrooms, setClassrooms] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [displayedCharacters, setDisplayedCharacters] = useState<Character[]>([]);
+  const [userRole, setUserRole] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [identifier, setIdentifier] = useState("");
+  const router = useRouter();
+
+  const handleJoin = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!identifier.trim()) {
+      alert("Kode classroom wajib diisi.");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const result = await fetchApi("/api/v1/classrooms/join", {
+        method: "POST",
+        body: JSON.stringify({
+          code: identifier.trim(),
+        }),
+      });
+
+      alert(result.message || "Berhasil bergabung ke classroom.");
+
+      // Kosongkan input
+      setIdentifier("");
+
+      // Jika ingin redirect setelah join
+      router.push("/dashboard/classrooms");
+    } catch (err: any) {
+      alert(err.message || "Gagal bergabung ke classroom.");
+      console.log(err);
+      console.log(err.response);
+      console.log(err.message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   useEffect(() => {
     // Ambil gender dan role pemain dari localStorage (diset saat daftar/login)
-    const userGender = localStorage.getItem('userGender');
-    const userRole = localStorage.getItem('userRole');
+    setUserRole(localStorage.getItem("userRole") || "");
+    const userRole = localStorage.getItem("userRole");
 
-    if (userRole === 'admin' || userRole === 'SUPER_ADMIN' || userRole === 'ADMIN') {
+    if (
+      userRole === "admin" ||
+      userRole === "SUPER_ADMIN" ||
+      userRole === "ADMIN"
+    ) {
       setIsAdmin(true);
     }
-
-    // Jika pemain perempuan, cari Husbu (cowo). Jika laki-laki, cari Waifu (cewe).
-    const determinedGender = (userGender && userGender.toLowerCase() === 'female') ? 'cowo' : 'cewe';
-    setTargetGender(determinedGender);
-
-    const loadTopics = async () => {
-      try {
-        const res = await fetchApi('/api/v1/topics');
-        if (res.data) {
-          const mapped = mapTopicsToCharacters(res.data, determinedGender);
-          setDisplayedCharacters(mapped);
-        }
-      } catch (err) {
-        console.error("Gagal memuat topik:", err);
-      } finally {
-        setIsLoaded(true);
-      }
-    };
-
-    loadTopics();
   }, []);
 
   return (
-    <main className="mobile-scroll-fix" style={{
-      minHeight: '100vh',
-      backgroundImage: 'url("/bg_kelas.png")',
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-      position: 'relative',
-      padding: '2rem'
-    }}>
+    <main
+      className="mobile-scroll-fix"
+      style={{
+        minHeight: "100vh",
+        backgroundImage: 'url("/bg_kelas.png")',
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        position: "relative",
+        padding: "2rem",
+      }}
+    >
       {/* Dark overlay to make UI pop */}
-      <div style={{
-        position: 'absolute',
-        top: 0, left: 0, right: 0, bottom: 0,
-        backgroundColor: 'rgba(15, 16, 21, 0.4)',
-        zIndex: 0
-      }}></div>
+      <div
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: "rgba(15, 16, 21, 0.4)",
+          zIndex: 0,
+        }}
+      ></div>
 
-      <DashboardHeader 
-        isAdmin={isAdmin} 
-        isMobileMenuOpen={isMobileMenuOpen} 
-        setIsMobileMenuOpen={setIsMobileMenuOpen} 
+      <DashboardHeader
+        isAdmin={isAdmin}
+        isMobileMenuOpen={isMobileMenuOpen}
+        setIsMobileMenuOpen={setIsMobileMenuOpen}
       />
 
-      <div className="mobile-dashboard-title" style={{ position: 'relative', zIndex: 1, maxWidth: '1200px', margin: '0 auto', paddingTop: '6rem' }}>
-
+      <div
+        className="mobile-dashboard-title"
+        style={{
+          position: "relative",
+          zIndex: 1,
+          maxWidth: "1200px",
+          margin: "0 auto",
+          paddingTop: "6rem",
+        }}
+      >
         {/* Title */}
-        <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
-          <h1 className="animate-fade-in" style={{
-            fontSize: '2.5rem',
-            color: 'white',
-            textShadow: '0 4px 15px rgba(255, 71, 126, 0.5)'
-          }}>
-            Pilih Karakter
+        <div style={{ textAlign: "center", marginBottom: "4rem" }}>
+          <h1
+            className="animate-fade-in"
+            style={{
+              fontSize: "2.5rem",
+              color: "white",
+              textShadow: "0 4px 15px rgba(255, 71, 126, 0.5)",
+            }}
+          >
+            Join Classroom
           </h1>
         </div>
 
-        {/* Character Selection */}
-        <div className="dashboard-char-list" style={{
-          display: 'flex',
-          justifyContent: 'center',
-          gap: '2rem',
-          flexWrap: 'wrap'
-        }}>
-          {!isLoaded ? (
-            <div style={{ color: 'white', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem', marginTop: '4rem' }}>
-              <div style={{ width: '40px', height: '40px', border: '4px solid rgba(255, 71, 126, 0.3)', borderTopColor: '#ff477e', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
-              <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-              <p style={{ fontWeight: '500', letterSpacing: '1px' }}>Memuat Topik...</p>
-            </div>
-          ) : displayedCharacters.length === 0 ? (
-            <div style={{ color: 'white', textAlign: 'center', marginTop: '2rem' }}>Belum ada topik yang tersedia.</div>
-          ) : (
-            displayedCharacters.map((char, index) => (
-              <CharacterCard key={char.topicId} char={char} index={index} />
-            ))
-          )}
-        </div>
+        {/* Classroom Join */}
+        <JoinLayout title="Masuk" subtitle="Silahkan masuk ke classroom">
+          <form
+            onSubmit={handleJoin}
+            style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
+          >
+            <TextInput
+              label="Kode Classroom"
+              type="text"
+              value={identifier}
+              onChange={(e) => setIdentifier(e.target.value)}
+              placeholder="Masukan kode classroom"
+              disabled={isSubmitting}
+            />
 
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              style={{
+                width: "100%",
+                padding: "12px",
+                backgroundColor: isSubmitting ? "#a0a5b5" : "#ff477e",
+                color: "white",
+                border: "none",
+                borderRadius: "8px",
+                fontWeight: "600",
+                fontSize: "1rem",
+                marginTop: "1rem",
+                cursor: isSubmitting ? "not-allowed" : "pointer",
+                boxShadow: isSubmitting
+                  ? "none"
+                  : "0 4px 14px rgba(255, 71, 126, 0.4)",
+              }}
+            >
+              {isSubmitting ? "Memeriksa..." : "Masuk"}
+            </button>
+          </form>
+        </JoinLayout>
       </div>
     </main>
   );
