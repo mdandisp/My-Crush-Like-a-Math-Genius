@@ -14,9 +14,18 @@ export default function AdminTopicsPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetchApi(`/api/v1/classrooms/${id}/topics`)
+    setIsLoading(true);
+
+    // 1. Ambil SEMUA topik (karena endpoint ini yang berhasil)
+    fetchApi("/api/v1/topics")
       .then((res) => {
-        setTopics(res.data || []);
+        // 2. Filter data berdasarkan classroom_id yang ada di URL (id)
+        const allTopics = res.data || [];
+        const filteredTopics = allTopics.filter(
+          (topic: any) => topic.classroom_id === id,
+        );
+
+        setTopics(filteredTopics);
       })
       .catch((err) => {
         toast.error("Gagal mengambil daftar topik: " + err.message);
@@ -24,7 +33,7 @@ export default function AdminTopicsPage() {
       .finally(() => {
         setIsLoading(false);
       });
-  }, []);
+  }, [id]); // Tambahkan [id] agar data ter-refresh jika pindah kelas
 
   const handleDelete = async (id: string, name: string) => {
     if (

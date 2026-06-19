@@ -9,6 +9,7 @@ export default function AdminClassroomsPage() {
   const [classrooms, setClassrooms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [userRole, setUserRole] = useState("");
 
   useEffect(() => {
     const fetchClassrooms = async () => {
@@ -21,6 +22,8 @@ export default function AdminClassroomsPage() {
         setLoading(false);
       }
     };
+
+    setUserRole(localStorage.getItem("userRole") || "");
 
     fetchClassrooms();
   }, []);
@@ -85,7 +88,7 @@ export default function AdminClassroomsPage() {
         }}
       >
         {classrooms.map((cls: any) => (
-          <ClassroomCard key={cls.id} cls={cls} />
+          <ClassroomCard key={cls.id} cls={cls} role={userRole} />
         ))}
       </div>
     </div>

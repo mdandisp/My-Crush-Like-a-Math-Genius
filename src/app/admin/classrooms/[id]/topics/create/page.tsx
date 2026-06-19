@@ -9,6 +9,8 @@ import { useParams } from "next/navigation";
 export default function CreateTopicPage() {
   const params = useParams();
   const classroomId = params.id as string;
+  const [isLoading, setIsLoading] = useState(false);
+
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -17,19 +19,25 @@ export default function CreateTopicPage() {
     female_dating_dialog: "",
     male_dating_dialog: "",
     status: "",
-    level_settings: [
-      {
-        level: "easy",
-        true_score: 0,
-        false_score: 0,
-      },
-    ],
+    level_settings: {
+      Easy: { plus: 10, minus: 0 },
+      Medium: { plus: 20, minus: -5 },
+      Hard: { plus: 30, minus: -10 },
+    },
     max_attempts: 0,
     female_normal_img: null as File | null,
     male_normal_img: null as File | null,
     female_dating_img: null as File | null,
     male_dating_img: null as File | null,
   });
+
+  const levelSettingsArray = Object.entries(formData.level_settings).map(
+    ([level, value]) => ({
+      level: level.toLowerCase(),
+      true_score: value.plus,
+      false_score: value.minus,
+    }),
+  );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,7 +54,7 @@ export default function CreateTopicPage() {
     payload.append("female_dating_dialog", formData.female_dating_dialog);
     payload.append("male_dating_dialog", formData.male_dating_dialog);
     payload.append("status", formData.status);
-    payload.append("level_settings", JSON.stringify(formData.level_settings));
+    payload.append("level_settings", JSON.stringify(levelSettingsArray));
     payload.append("max_attempts", String(formData.max_attempts));
 
     // 3. Masukkan file jika ada
@@ -91,6 +99,44 @@ export default function CreateTopicPage() {
     border: "1px solid rgba(255,255,255,0.2)",
     color: "#a0a5b5",
     cursor: "pointer",
+  };
+
+  const inputStyle = {
+    width: "100%",
+    padding: "10px 14px",
+    borderRadius: "8px",
+    backgroundColor: "rgba(0,0,0,0.3)",
+    border: "1px solid rgba(255,255,255,0.2)",
+    color: "white",
+    outline: "none",
+    fontSize: "0.95rem",
+  };
+
+  const sectionStyle = {
+    backgroundColor: "rgba(255,255,255,0.03)",
+    border: "1px solid rgba(255,255,255,0.1)",
+    borderRadius: "12px",
+    padding: "1.5rem",
+    display: "flex",
+    flexDirection: "column" as const,
+    gap: "1rem",
+  };
+
+  const handleLevelChange = (
+    level: "Easy" | "Medium" | "Hard",
+    field: "plus" | "minus",
+    val: string,
+  ) => {
+    setFormData({
+      ...formData,
+      level_settings: {
+        ...formData.level_settings,
+        [level]: {
+          ...formData.level_settings[level],
+          [field]: parseInt(val) || 0,
+        },
+      },
+    });
   };
 
   return (
@@ -348,56 +394,103 @@ export default function CreateTopicPage() {
             />
           </div>
 
-          <div>
-            <label
+          <div style={sectionStyle}>
+            <h2
               style={{
-                display: "block",
-                color: "#a0a5b5",
-                marginBottom: "8px",
-                fontWeight: "600",
+                color: "#22c55e",
+                fontSize: "1.2rem",
+                margin: "0 0 10px 0",
               }}
             >
-              Level
-            </label>
-            <input
-              type="text"
-              value={formData.level_settings[0].level}
-              onChange={(e) => {
-                const levels = [...formData.level_settings];
-                levels[0].level = e.target.value;
-
-                setFormData({
-                  ...formData,
-                  level_settings: levels,
-                });
-              }}
-            />
-            <input
-              type="number"
-              value={formData.level_settings[0].true_score}
-              onChange={(e) => {
-                const levels = [...formData.level_settings];
-                levels[0].true_score = Number(e.target.value);
-
-                setFormData({
-                  ...formData,
-                  level_settings: levels,
-                });
-              }}
-            />
-            <input
-              type="number"
-              value={formData.level_settings[0].false_score}
-              onChange={(e) => {
-                const levels = [...formData.level_settings];
-                levels[0].false_score = Number(e.target.value);
-
-                setFormData({
-                  ...formData,
-                  level_settings: levels,
-                });
-              }}
-            />
+              Pengaturan Skor per Level
+            </h2>
+            {(["Easy", "Medium", "Hard"] as const).map((lvl) => (
+              <div
+                key={lvl}
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "0.5rem",
+                  marginBottom: "1rem",
+                }}
+              >
+                <div
+                  style={{
+                    color: "white",
+                    fontWeight: "600",
+                    textTransform: "capitalize",
+                    fontSize: "1.1rem",
+                  }}
+                >
+                  {lvl}
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    gap: "1rem",
+                    alignItems: "center",
+                    width: "100%",
+                  }}
+                >
+                  <div
+                    style={{
+                      flex: 1,
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
+                    }}
+                  >
+                    <span
+                      style={{
+                        color: "#22c55e",
+                        minWidth: "60px",
+                        fontSize: "0.9rem",
+                        fontWeight: "600",
+                      }}
+                    >
+                      + Benar:
+                    </span>
+                    <input
+                      type="number"
+                      style={inputStyle}
+                      value={formData.level_settings[lvl].plus}
+                      onChange={(e) =>
+                        handleLevelChange(lvl, "plus", e.target.value)
+                      }
+                      disabled={isLoading}
+                    />
+                  </div>
+                  <div
+                    style={{
+                      flex: 1,
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
+                    }}
+                  >
+                    <span
+                      style={{
+                        color: "#ef4444",
+                        minWidth: "60px",
+                        fontSize: "0.9rem",
+                        fontWeight: "600",
+                      }}
+                    >
+                      - Salah:
+                    </span>
+                    <input
+                      type="number"
+                      style={inputStyle}
+                      value={formData.level_settings[lvl].minus}
+                      onChange={(e) =>
+                        handleLevelChange(lvl, "minus", e.target.value)
+                      }
+                      disabled={isLoading}
+                    />
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
 
           <div>
@@ -412,24 +505,18 @@ export default function CreateTopicPage() {
               Max Attempts
             </label>
             <input
-              placeholder="Tuliskan deksripsi atau aturan kelas..."
+              type="number"
+              min={1}
+              style={inputStyle}
               value={formData.max_attempts}
               onChange={(e) =>
                 setFormData({
                   ...formData,
-                  max_attempts: Number(e.target.value),
+                  max_attempts: parseInt(e.target.value) || 1,
                 })
               }
-              style={{
-                width: "100%",
-                padding: "12px 16px",
-                borderRadius: "8px",
-                backgroundColor: "rgba(0,0,0,0.3)",
-                border: "1px solid rgba(255,255,255,0.2)",
-                color: "white",
-                outline: "none",
-                resize: "vertical",
-              }}
+              required
+              disabled={isLoading}
             />
           </div>
 
