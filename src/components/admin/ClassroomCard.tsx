@@ -17,6 +17,9 @@ interface ClassroomCardProps {
 
 export default function ClassroomCard({ cls, role }: ClassroomCardProps) {
   const router = useRouter();
+
+  console.log(cls.codes);
+
   return (
     <div
       style={{
@@ -67,27 +70,29 @@ export default function ClassroomCard({ cls, role }: ClassroomCardProps) {
 
       {/* Info Tambahan dengan Icon */}
 
-      <div
-        style={{
-          marginBottom: "1rem",
-        }}
-      >
-        <p style={{ color: "#a0a5b5", fontSize: "0.8rem", margin: 0 }}>
-          Join Code:
-        </p>
-
-        <p
+      {role !== "user" && (
+        <div
           style={{
-            color: "#f0944d",
-            fontSize: "1.2rem",
-            margin: 0,
-            fontWeight: "bold",
-            letterSpacing: "2px",
+            marginBottom: "1rem",
           }}
         >
-          {cls.codes}
-        </p>
-      </div>
+          <p style={{ color: "#a0a5b5", fontSize: "0.8rem", margin: 0 }}>
+            Join Code:
+          </p>
+
+          <p
+            style={{
+              color: "#f0944d",
+              fontSize: "1.2rem",
+              margin: 0,
+              fontWeight: "bold",
+              letterSpacing: "2px",
+            }}
+          >
+            {cls.codes}
+          </p>
+        </div>
+      )}
       <div
         style={{
           display: "flex",
@@ -124,13 +129,16 @@ export default function ClassroomCard({ cls, role }: ClassroomCardProps) {
 
       {/* Tombol Aksi */}
       <div style={{ display: "flex", gap: "10px" }}>
-        {role === "SUB_ADMIN" ? (
+        {role === "user" ? (
           <button
-            onClick={() => router.push(`/admin/classrooms/${cls.id}/topics`)}
+            onClick={() => {
+              localStorage.setItem("classroomId", cls.id);
+              router.push("/topic");
+            }}
             style={{
               width: "100%",
               padding: "10px",
-              backgroundColor: "#3b82f6",
+              backgroundColor: "#22c55e",
               color: "white",
               border: "none",
               borderRadius: "8px",

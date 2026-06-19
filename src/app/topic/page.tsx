@@ -39,12 +39,15 @@ export default function DashboardPage() {
 
     const loadTopics = async () => {
       try {
-        const res = await fetchApi("/api/v1/topics");
+        const classroomId = localStorage.getItem("classroomId");
+
+        const res = await fetchApi(`/api/v1/topics?classroomId=${classroomId}`);
+
         if (res.data) {
           const mapped = mapTopicsToCharacters(res.data, determinedGender);
           setDisplayedCharacters(mapped);
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error("Gagal memuat topik:", err);
       } finally {
         setIsLoaded(true);
