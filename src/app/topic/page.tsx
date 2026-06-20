@@ -108,7 +108,7 @@ export default function DashboardPage() {
               textShadow: "0 4px 15px rgba(255, 71, 126, 0.5)",
             }}
           >
-            Pilih Karakter
+            Pilih Topik
           </h1>
         </div>
 
