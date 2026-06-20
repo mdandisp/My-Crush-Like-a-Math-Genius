@@ -134,47 +134,99 @@ export default function EditQuestionsPage({
     setQuestions(updated);
   };
 
-  const handleDelete = (idx: number) => {
-    const updated = questions.filter((_, i) => i !== idx);
-    setQuestions(updated);
-    setActiveTab(Math.max(0, idx - 1));
+  const handleDelete = async (idx: number) => {
+    const q = questions[idx];
+
+    try {
+      if (q.id) {
+        await fetchApi(`/api/v1/questions/${q.id}`, {
+          method: "DELETE",
+        });
+      }
+
+      const updated = questions.filter((_, i) => i !== idx);
+      setQuestions(updated);
+      setActiveTab(Math.max(0, idx - 1));
+
+      toast.success("Soal berhasil dihapus");
+    } catch (err: any) {
+      toast.error(err.message);
+    }
   };
 
   const handleSaveAll = async () => {
     setIsLoading(true);
+
     try {
-      // Group by level since the API expects batch per level
-      const grouped = {
-        Easy: questions.filter((q) => q.level === "Easy"),
-        Medium: questions.filter((q) => q.level === "Medium"),
-        Hard: questions.filter((q) => q.level === "Hard"),
-      };
-
-      for (const [level, qList] of Object.entries(grouped)) {
-        if (qList.length === 0) continue;
-
+      for (const q of questions) {
         const payload = {
+          content: q.content,
+          level: q.level.toLowerCase(),
+          timeLimit: q.timeLimit,
           topicId: resolvedParams.id,
-          level: level.toLowerCase(),
-          questions: qList.map((q) => ({
-            content: q.content,
-            timeLimit: q.timeLimit,
-            options: q.options.map((opt, idx) => ({
-              content: opt || "Opsi Kosong",
-              isCorrect: idx === q.correct_index,
-            })),
+          options: q.options.map((opt, idx) => ({
+            content: opt,
+            isCorrect: idx === q.correct_index,
           })),
         };
 
-        await fetchApi("/api/v1/questions/batch", {
-          method: "POST",
-          body: JSON.stringify(payload),
-        });
+        if (q.id) {
+          // UPDATE
+          await fetchApi(`/api/v1/questions/${q.id}`, {
+            method: "PUT",
+            body: JSON.stringify(payload),
+          });
+        } else {
+          // CREATE
+          await fetchApi("/api/v1/questions/batch", {
+            method: "POST",
+            body: JSON.stringify({
+              topicId: resolvedParams.id,
+              level: q.level.toLowerCase(),
+              questions: [
+                {
+                  content: q.content,
+                  timeLimit: q.timeLimit,
+                  options: q.options.map((opt, idx) => ({
+                    content: opt,
+                    isCorrect: idx === q.correct_index,
+                  })),
+                },
+              ],
+            }),
+          });
+        }
       }
 
-      toast.success("Berhasil menyimpan semua soal!");
+      toast.success("Berhasil menyimpan!");
+
+      // reload supaya id soal baru ikut terisi
+      const refreshed = await fetchAllQuestions(resolvedParams.id);
+
+      const mapped = refreshed.map((q: any) => {
+        let correctIdx = 0;
+
+        const opts = q.options?.map((o: any, idx: number) => {
+          if (o.is_correct) correctIdx = idx;
+          return o.content;
+        }) ?? ["", "", "", ""];
+
+        while (opts.length < 4) opts.push("");
+
+        return {
+          id: q.id,
+          content: q.content,
+          level: (q.level.charAt(0).toUpperCase() +
+            q.level.slice(1).toLowerCase()) as "Easy" | "Medium" | "Hard",
+          timeLimit: q.time_limit,
+          options: opts,
+          correct_index: correctIdx,
+        };
+      });
+
+      setQuestions(mapped);
     } catch (err: any) {
-      toast.error("Gagal menyimpan soal: " + err.message);
+      toast.error(err.message);
     } finally {
       setIsLoading(false);
     }
