@@ -5,6 +5,7 @@ import Link from "next/link";
 import { fetchApi } from "../../../../../utils/api";
 import BackButton from "../../../../../components/BackButton";
 import toast from "react-hot-toast";
+import { useParams } from "next/navigation";
 
 interface QuestionDraft {
   id?: string;
@@ -263,7 +264,10 @@ export default function EditQuestionsPage({
             borderBottom: "1px solid rgba(255,255,255,0.1)",
           }}
         >
-          <BackButton href="/admin/topics" style={{ marginBottom: "1rem" }} />
+          <BackButton
+            href="/admin/classrooms/"
+            style={{ marginBottom: "1rem" }}
+          />
           <h2 style={{ color: "white", fontSize: "1.2rem", margin: 0 }}>
             Kelola Soal
           </h2>

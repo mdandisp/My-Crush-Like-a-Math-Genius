@@ -43,10 +43,16 @@ export default function DashboardPage() {
 
         const res = await fetchApi(`/api/v1/topics?classroomId=${classroomId}`);
 
-        if (res.data) {
-          const mapped = mapTopicsToCharacters(res.data, determinedGender);
-          setDisplayedCharacters(mapped);
-        }
+        const mapped = res.data.map((topic: any) => ({
+          topicId: topic.id,
+          topicName: topic.name,
+          image:
+            determinedGender === "cewe"
+              ? topic.female_normal_img
+              : topic.male_normal_img,
+        }));
+
+        setDisplayedCharacters(mapped);
       } catch (err: any) {
         console.error("Gagal memuat topik:", err);
       } finally {

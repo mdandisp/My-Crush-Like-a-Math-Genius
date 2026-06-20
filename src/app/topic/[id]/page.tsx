@@ -30,46 +30,70 @@ export default function TopicDetail({
     "Easy",
   );
   const [questionCount, setQuestionCount] = useState<number | "">(5);
-  const [attempts, setAttempts] = useState(0);
+  const [attemptsInfo, setAttemptsInfo] = useState({
+    max_attempts: 0,
+    remaining_attempts: 0,
+    current_attempts: 0,
+  });
 
   useEffect(() => {
     const loadTopicAndCharacter = async () => {
       // 1. Ambil target gender
       const userGender = localStorage.getItem("userGender");
-      const targetType =
-        userGender && userGender.toLowerCase() === "female" ? "cowo" : "cewe";
+      const isFemale = userGender?.toLowerCase() === "female";
 
       try {
         // 2. Fetch Topics from Backend
-        const res = await fetchApi("/api/v1/topics");
+        const res = await fetchApi(`/api/v1/topics/${resolvedParams.id}`);
+
+        const topic = res.data;
+
+        const character = {
+          id: topic.id,
+          topicId: topic.id,
+          topicName: topic.name,
+          name: topic.name,
+          info: topic.description,
+
+          image: isFemale ? topic.male_normal_img : topic.female_normal_img,
+
+          dialog: isFemale
+            ? topic.male_normal_dialog
+            : topic.female_normal_dialog,
+
+          datingImage: isFemale
+            ? topic.male_dating_img
+            : topic.female_dating_img,
+
+          datingDialog: isFemale
+            ? topic.male_dating_dialog
+            : topic.female_dating_dialog,
+        };
         if (res.data) {
           // 3. Map Topics to Characters
-          const mapped = mapTopicsToCharacters(res.data, targetType);
-          setDisplayedChars(mapped);
-
-          // 4. Temukan karakter yang sesuai dengan UUID topik di URL
-          const found = mapped.find((c) => c.topicId === resolvedParams.id);
-          if (found) {
-            setCharacter(found);
-
-            // 5. Load attempts history from backend
-            try {
-              const attemptRes = await fetchApi(
-                `/api/v1/topics/${resolvedParams.id}/attempts/info`,
-              );
-              if (attemptRes && attemptRes.data) {
-                setAttempts(attemptRes.data.current_attempts || 0);
-              }
-            } catch (error) {
-              setAttempts(0);
-            }
-          } else {
-            // Jika topic tidak ditemukan, kembali ke dashboard
-            router.push("/dashboard");
-          }
+          setCharacter(character);
+          // setAttempts(topic.max_attempts);
+          // console.log(topic.max_attempts);
         } else {
           router.push("/dashboard");
         }
+
+        const attemptsRes = await fetchApi(
+          `/api/v1/topics/${resolvedParams.id}/attempts/info`,
+        );
+        const attempts = attemptsRes.data;
+        const attemptsInfo = {
+          max_attempts: attempts.max_attempts,
+          remaining_attempts: attempts.remaining_attempts,
+        };
+
+        setAttemptsInfo({
+          max_attempts: attempts.max_attempts,
+          remaining_attempts: attempts.remaining_attempts,
+          current_attempts: attempts.current_attempts,
+        });
+
+        // setTopicInfo(attemptsRes.data);
       } catch (error) {
         console.error("Gagal memuat topik:", error);
         router.push("/dashboard");
@@ -120,7 +144,7 @@ export default function TopicDetail({
 
       {/* Back button */}
       <BackButton
-        href="/dashboard"
+        href="/topic"
         style={{
           position: "absolute",
           top: "1.5rem",
@@ -197,15 +221,17 @@ export default function TopicDetail({
         >
           {/* Left: Character Image */}
           <div
-            className="topic-left-img"
+            className="quiz-character-card desktop-only"
             style={{
-              width: "45%",
-              position: "relative",
-              backgroundColor: "transparent",
-              display: "flex",
+              backgroundColor: "rgba(255, 255, 255, 0.15)",
+              backdropFilter: "blur(4px)",
+              borderRadius: "12px",
+              overflow: "hidden",
+              boxShadow: "0 6px 20px rgba(0,0,0,0.2)",
+              border: "2px solid rgba(255,255,255,0.25)",
+              flex: 1,
               flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "flex-end",
+              position: "relative",
             }}
           >
             <img
@@ -214,11 +240,10 @@ export default function TopicDetail({
               className="animate-fade-in"
               key={character.id}
               style={{
-                height: "90%",
-                objectFit: "contain",
-                position: "absolute",
-                bottom: "20px",
-                zIndex: 1,
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+                objectPosition: "top center",
               }}
             />
             {/* Affection Bar */}
@@ -442,7 +467,7 @@ export default function TopicDetail({
           border: "1px solid rgba(255,255,255,0.1)",
         }}
       >
-        {attempts >= GAME_SETTINGS.maxAttemptsPerCharacter ? (
+        {attemptsInfo.current_attempts >= attemptsInfo.max_attempts ? (
           <div
             style={{
               color: "#ff477e",
@@ -453,7 +478,7 @@ export default function TopicDetail({
             }}
           >
             🚫 Anda telah mencapai batas maksimal attempt (
-            {GAME_SETTINGS.maxAttemptsPerCharacter} kali) untuk karakter ini.
+            {attemptsInfo.max_attempts} kali) untuk karakter ini.
           </div>
         ) : (
           <>
@@ -466,8 +491,7 @@ export default function TopicDetail({
             >
               Sisa Attempt:{" "}
               <span style={{ color: "#f0944d" }}>
-                {GAME_SETTINGS.maxAttemptsPerCharacter - attempts} /{" "}
-                {GAME_SETTINGS.maxAttemptsPerCharacter}
+                {attemptsInfo.remaining_attempts} / {attemptsInfo.max_attempts}
               </span>
             </div>
 
