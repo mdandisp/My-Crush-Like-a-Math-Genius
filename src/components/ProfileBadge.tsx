@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
+import { fetchApi } from '../utils/api';
 
 interface ProfileBadgeProps {
   name?: string;
@@ -17,10 +18,33 @@ export default function ProfileBadge({ name = "Pemain 1", level, size = 'medium'
   const [avatarUrl, setAvatarUrl] = useState('/char-mc.png');
 
   useEffect(() => {
+    const loadProfile = async () => {
+      try {
+        const res = await fetchApi('/api/v1/users/me');
+        if (res.data) {
+          const user = res.data;
+          if (user.username) {
+            setDisplayName(user.username);
+            localStorage.setItem('userName', user.username); // Cache for immediate load
+          }
+          if (user.profile_picture_url) {
+            setAvatarUrl(user.profile_picture_url);
+            localStorage.setItem('userAvatar', user.profile_picture_url);
+          }
+        }
+      } catch (err) {
+        // Fallback to local storage if API fails
+      }
+    };
+    
+    // First load from cache for fast UI
     const savedName = localStorage.getItem('userName');
     if (savedName) setDisplayName(savedName);
     const savedAvatar = localStorage.getItem('userAvatar');
     if (savedAvatar) setAvatarUrl(savedAvatar);
+
+    // Then fetch fresh data from API
+    loadProfile();
   }, []);
 
   return (

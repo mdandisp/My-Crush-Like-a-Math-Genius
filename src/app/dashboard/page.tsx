@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import toast from "react-hot-toast";
 import ProfileBadge from "../../components/ProfileBadge";
 import { fetchApi } from "../../utils/api";
 import DashboardHeader from "../../components/dashboard/DashboardHeader";
@@ -24,7 +25,7 @@ export default function ClassroomPage() {
     e.preventDefault();
 
     if (!identifier.trim()) {
-      alert("Kode classroom wajib diisi.");
+      toast.error("Kode classroom wajib diisi.");
       return;
     }
 
@@ -38,7 +39,7 @@ export default function ClassroomPage() {
         }),
       });
 
-      alert(result.message || "Berhasil bergabung ke classroom.");
+      toast.success(result.message || "Berhasil bergabung ke classroom.");
 
       // Kosongkan input
       setIdentifier("");
@@ -46,7 +47,11 @@ export default function ClassroomPage() {
       // Jika ingin redirect setelah join
       router.push("/dashboard/classrooms");
     } catch (err: any) {
-      alert(err.message || "Gagal bergabung ke classroom.");
+      let errorMsg = err.message || "Gagal bergabung ke classroom.";
+      if (errorMsg.toLowerCase().includes("not found")) {
+        errorMsg = "Kode kelas tidak ditemukan";
+      }
+      toast.error(errorMsg);
       console.log(err);
       console.log(err.response);
       console.log(err.message);

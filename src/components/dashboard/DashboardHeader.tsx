@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import ProfileBadge from "../ProfileBadge";
 
 interface DashboardHeaderProps {
@@ -12,6 +15,8 @@ export default function DashboardHeader({
   isMobileMenuOpen,
   setIsMobileMenuOpen,
 }: DashboardHeaderProps) {
+  const pathname = usePathname();
+
   return (
     <>
       {/* Full width absolute header to reach corners */}
@@ -36,41 +41,64 @@ export default function DashboardHeader({
           className="desktop-nav"
           style={{ display: "flex", gap: "1rem", alignItems: "center" }}
         >
-          <Link
-            href="/dashboard"
-            style={{
-              color: "white",
-              textDecoration: "none",
-              fontSize: "0.9rem",
-              fontWeight: "600",
-              backgroundColor: "rgba(255,255,255,0.1)",
-              backdropFilter: "blur(10px)",
-              padding: "8px 18px",
-              borderRadius: "20px",
-              border: "1px solid rgba(255,255,255,0.2)",
-              transition: "all 0.2s",
-            }}
-          >
-            Join Classroom
-          </Link>
-          <Link
-            href="/dashboard/classrooms"
-            style={{
-              color: "white",
-              textDecoration: "none",
-              fontSize: "0.9rem",
-              fontWeight: "600",
-              backgroundColor: "rgba(255,255,255,0.1)",
-              backdropFilter: "blur(10px)",
-              padding: "8px 18px",
-              borderRadius: "20px",
-              border: "1px solid rgba(255,255,255,0.2)",
-              transition: "all 0.2s",
-            }}
-          >
-            My Classroom
-          </Link>
-          {isAdmin && (
+          {pathname !== "/dashboard" && (
+            <Link
+              href="/dashboard"
+              style={{
+                color: "white",
+                textDecoration: "none",
+                fontSize: "0.9rem",
+                fontWeight: "600",
+                backgroundColor: "rgba(255,255,255,0.1)",
+                backdropFilter: "blur(10px)",
+                padding: "8px 18px",
+                borderRadius: "20px",
+                border: "1px solid rgba(255,255,255,0.2)",
+                transition: "all 0.2s",
+              }}
+            >
+              ➕ Join Classroom
+            </Link>
+          )}
+          {pathname !== "/dashboard/classrooms" && (
+            <Link
+              href="/dashboard/classrooms"
+              style={{
+                color: "white",
+                textDecoration: "none",
+                fontSize: "0.9rem",
+                fontWeight: "600",
+                backgroundColor: "rgba(255,255,255,0.1)",
+                backdropFilter: "blur(10px)",
+                padding: "8px 18px",
+                borderRadius: "20px",
+                border: "1px solid rgba(255,255,255,0.2)",
+                transition: "all 0.2s",
+              }}
+            >
+              📚 My Classroom
+            </Link>
+          )}
+          {pathname !== "/leaderboard" && (
+            <Link
+              href="/leaderboard"
+              style={{
+                color: "white",
+                textDecoration: "none",
+                fontSize: "0.9rem",
+                fontWeight: "600",
+                backgroundColor: "rgba(255,255,255,0.1)",
+                backdropFilter: "blur(10px)",
+                padding: "8px 18px",
+                borderRadius: "20px",
+                border: "1px solid rgba(255,255,255,0.2)",
+                transition: "all 0.2s",
+              }}
+            >
+              🏆 Leaderboard
+            </Link>
+          )}
+          {isAdmin && pathname !== "/admin" && (
             <Link
               href="/admin"
               style={{
@@ -86,7 +114,7 @@ export default function DashboardHeader({
                 transition: "all 0.2s",
               }}
             >
-              Admin
+              ⚙️ Admin
             </Link>
           )}
         </div>
@@ -145,21 +173,55 @@ export default function DashboardHeader({
             minWidth: "180px",
           }}
         >
-          <Link
-            href="/leaderboard"
-            style={{
-              color: "white",
-              textDecoration: "none",
-              padding: "10px 15px",
-              borderRadius: "8px",
-              fontWeight: "600",
-              fontSize: "0.9rem",
-              backgroundColor: "rgba(255,255,255,0.05)",
-            }}
-          >
-            🏆 Leaderboard
-          </Link>
-          {isAdmin && (
+          {pathname !== "/dashboard" && (
+            <Link
+              href="/dashboard"
+              style={{
+                color: "white",
+                textDecoration: "none",
+                padding: "10px 15px",
+                borderRadius: "8px",
+                fontWeight: "600",
+                fontSize: "0.9rem",
+                backgroundColor: "rgba(255,255,255,0.05)",
+              }}
+            >
+              ➕ Join Classroom
+            </Link>
+          )}
+          {pathname !== "/dashboard/classrooms" && (
+            <Link
+              href="/dashboard/classrooms"
+              style={{
+                color: "white",
+                textDecoration: "none",
+                padding: "10px 15px",
+                borderRadius: "8px",
+                fontWeight: "600",
+                fontSize: "0.9rem",
+                backgroundColor: "rgba(255,255,255,0.05)",
+              }}
+            >
+              📚 My Classroom
+            </Link>
+          )}
+          {pathname !== "/leaderboard" && (
+            <Link
+              href="/leaderboard"
+              style={{
+                color: "white",
+                textDecoration: "none",
+                padding: "10px 15px",
+                borderRadius: "8px",
+                fontWeight: "600",
+                fontSize: "0.9rem",
+                backgroundColor: "rgba(255,255,255,0.05)",
+              }}
+            >
+              🏆 Leaderboard
+            </Link>
+          )}
+          {isAdmin && pathname !== "/admin" && (
             <Link
               href="/admin"
               style={{

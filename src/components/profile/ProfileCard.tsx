@@ -1,19 +1,14 @@
 interface ProfileCardProps {
   avatarUrl: string;
   handleAvatarChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  isEditingName: boolean;
-  tempName: string;
-  setTempName: (val: string) => void;
-  handleSaveName: () => void;
   userName: string;
-  setIsEditingName: (val: boolean) => void;
+  handle: string;
   userRole: string;
   handleLogout: () => void;
 }
 
 export default function ProfileCard({
-  avatarUrl, handleAvatarChange, isEditingName, tempName, setTempName,
-  handleSaveName, userName, setIsEditingName, userRole, handleLogout
+  avatarUrl, handleAvatarChange, userName, handle, userRole, handleLogout
 }: ProfileCardProps) {
   return (
     <div className="glass-card animate-fade-in" style={{ padding: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem', textAlign: 'center' }}>
@@ -45,46 +40,9 @@ export default function ProfileCard({
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', marginBottom: '0.5rem', flexWrap: 'wrap' }}>
-          {isEditingName ? (
-            <div style={{ display: 'flex', gap: '8px' }}>
-              <input
-                type="text"
-                value={tempName}
-                onChange={(e) => setTempName(e.target.value)}
-                autoFocus
-                style={{
-                  padding: '4px 8px', borderRadius: '4px', border: '1px solid #ff477e',
-                  backgroundColor: 'rgba(0,0,0,0.5)', color: 'white', outline: 'none'
-                }}
-              />
-              <button
-                onClick={handleSaveName}
-                style={{
-                  padding: '4px 12px', backgroundColor: '#ff477e', color: 'white',
-                  border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem'
-                }}
-              >
-                Simpan
-              </button>
-            </div>
-          ) : (
-            <>
-              <h2 style={{ color: 'white', fontSize: '1.8rem', margin: 0 }}>{userName}</h2>
-              <button
-                onClick={() => {
-                  setTempName(userName);
-                  setIsEditingName(true);
-                }}
-                style={{
-                  background: 'transparent', border: 'none', color: '#ff477e', cursor: 'pointer',
-                  fontSize: '0.9rem', textDecoration: 'underline'
-                }}
-              >
-                Ubah
-              </button>
-            </>
-          )}
+          <h2 style={{ color: 'white', fontSize: '1.8rem', margin: 0 }}>{userName}</h2>
         </div>
+        <p style={{ color: '#ff477e', fontSize: '1.1rem', margin: '0 0 1rem 0', fontWeight: '500' }}>{handle}</p>
         <p style={{ color: '#a0a5b5', fontSize: '1rem', marginBottom: '1.5rem', wordBreak: 'break-word', textAlign: 'center' }}>Level: 1 | Role : {userRole}</p>
         <button
           onClick={handleLogout}

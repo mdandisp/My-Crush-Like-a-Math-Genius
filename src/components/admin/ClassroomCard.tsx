@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { fetchApi } from "../../utils/api";
 
 interface ClassroomCardProps {
   cls: {
@@ -18,7 +20,35 @@ interface ClassroomCardProps {
 export default function ClassroomCard({ cls, role }: ClassroomCardProps) {
   const router = useRouter();
 
-  console.log(cls.codes);
+  const [teacher, setTeacher] = useState(cls.teacher || "N/A");
+  const [studentsCount, setStudentsCount] = useState(cls.students || 0);
+
+  useEffect(() => {
+    if (!cls.teacher || cls.students === undefined) {
+      const fetchMembers = async () => {
+        try {
+          const res = await fetchApi(`/api/v1/classrooms/${cls.id}/members`);
+          if (res.data) {
+            const members = res.data;
+            let sCount = 0;
+            let tName = "N/A";
+            members.forEach((m: any) => {
+              const role = (m.role || "").toLowerCase();
+              if (role === "student") sCount++;
+              if (role === "teacher" || role === "owner" || role === "admin") {
+                tName = m.first_name ? `${m.first_name} ${m.last_name || ""}`.trim() : (m.username || "Teacher");
+              }
+            });
+            setTeacher(tName);
+            setStudentsCount(sCount);
+          }
+        } catch (e) {
+          console.error("Failed to fetch classroom members", e);
+        }
+      };
+      fetchMembers();
+    }
+  }, [cls.id, cls.teacher, cls.students]);
 
   return (
     <div
@@ -111,7 +141,7 @@ export default function ClassroomCard({ cls, role }: ClassroomCardProps) {
           }}
         >
           <span>👨‍🏫</span> Guru:{" "}
-          <strong style={{ color: "white" }}>{cls.teacher || "N/A"}</strong>
+          <strong style={{ color: "white" }}>{teacher}</strong>
         </div>
         <div
           style={{
@@ -123,7 +153,7 @@ export default function ClassroomCard({ cls, role }: ClassroomCardProps) {
           }}
         >
           <span>👥</span> Murid:{" "}
-          <strong style={{ color: "white" }}>{cls.students || 0} siswa</strong>
+          <strong style={{ color: "white" }}>{studentsCount} siswa</strong>
         </div>
       </div>
 

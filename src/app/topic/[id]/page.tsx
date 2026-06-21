@@ -35,6 +35,15 @@ export default function TopicDetail({
     remaining_attempts: 0,
     current_attempts: 0,
   });
+  const [levelSettings, setLevelSettings] = useState<any[]>([]);
+  const [rankings, setRankings] = useState<any[]>([]);
+
+  const getDisplayName = (player: any) => {
+    if (player.first_name) {
+      return `${player.first_name} ${player.last_name || ''}`.trim();
+    }
+    return player.username || 'Pemain';
+  };
 
   useEffect(() => {
     const loadTopicAndCharacter = async () => {
@@ -92,6 +101,15 @@ export default function TopicDetail({
           remaining_attempts: attempts.remaining_attempts,
           current_attempts: attempts.current_attempts,
         });
+        if (attempts.level_settings) {
+          setLevelSettings(attempts.level_settings);
+        }
+
+        const cid = localStorage.getItem("classroomId") || "";
+        if (cid) {
+          const lbRes = await fetchApi(`/api/v1/leaderboard?classroomId=${cid}&topicId=${resolvedParams.id}`);
+          if (lbRes.data) setRankings(lbRes.data);
+        }
 
         // setTopicInfo(attemptsRes.data);
       } catch (error) {
@@ -103,13 +121,27 @@ export default function TopicDetail({
     loadTopicAndCharacter();
   }, [resolvedParams.id, router]);
 
+  // Get max questions for current difficulty from API or fallback to GAME_SETTINGS
+  const getCurrentMaxQuestions = () => {
+    if (levelSettings && levelSettings.length > 0) {
+      const setting = levelSettings.find(
+        (s) => s.level.toLowerCase() === difficulty.toLowerCase()
+      );
+      if (setting && typeof setting.remaining_questions === "number") {
+        return setting.remaining_questions;
+      }
+    }
+    return GAME_SETTINGS.questionLimits[difficulty];
+  };
+
+  const maxQuestions = getCurrentMaxQuestions();
+
   // Adjust question count if it exceeds new difficulty max
   useEffect(() => {
-    const max = GAME_SETTINGS.questionLimits[difficulty];
-    if (typeof questionCount === "number" && questionCount > max) {
-      setQuestionCount(max);
+    if (typeof questionCount === "number" && questionCount > maxQuestions) {
+      setQuestionCount(maxQuestions);
     }
-  }, [difficulty]);
+  }, [difficulty, maxQuestions]);
 
   if (!character)
     return (
@@ -375,9 +407,9 @@ export default function TopicDetail({
                     gap: "8px",
                   }}
                 >
-                  {mockRanking.map((player) => (
+                  {rankings.length > 0 ? rankings.map((player, idx) => (
                     <div
-                      key={player.rank}
+                      key={player.user_id || idx}
                       style={{
                         display: "flex",
                         alignItems: "center",
@@ -385,7 +417,7 @@ export default function TopicDetail({
                         padding: "8px 12px",
                         borderRadius: "8px",
                         backgroundColor:
-                          player.rank <= 3
+                          (player.rank || idx + 1) <= 3
                             ? "rgba(240, 148, 77, 0.08)"
                             : "transparent",
                       }}
@@ -396,7 +428,7 @@ export default function TopicDetail({
                           width: "28px",
                           height: "28px",
                           borderRadius: "50%",
-                          backgroundColor: getRankBadgeColor(player.rank),
+                          backgroundColor: getRankBadgeColor(player.rank || idx + 1),
                           color: "white",
                           display: "flex",
                           alignItems: "center",
@@ -406,8 +438,17 @@ export default function TopicDetail({
                           flexShrink: 0,
                         }}
                       >
-                        {player.rank}
+                        {player.rank || idx + 1}
                       </div>
+                      
+                      {player.profile_picture_url && (
+                        <div style={{
+                          width: '24px', height: '24px', borderRadius: '50%',
+                          backgroundImage: `url(${player.profile_picture_url})`,
+                          backgroundSize: 'cover', backgroundPosition: 'center', flexShrink: 0
+                        }}></div>
+                      )}
+
                       {/* Name */}
                       <span
                         style={{
@@ -417,7 +458,7 @@ export default function TopicDetail({
                           fontWeight: "500",
                         }}
                       >
-                        {player.name}
+                        {getDisplayName(player)}
                       </span>
                       {/* Score */}
                       <div
@@ -430,18 +471,16 @@ export default function TopicDetail({
                         <span style={{ color: "#22c55e", fontSize: "0.8rem" }}>
                           ✓
                         </span>
-                        <span
-                          style={{
-                            fontSize: "0.85rem",
-                            color: "#333",
-                            fontWeight: "600",
-                          }}
-                        >
-                          {player.score}
+                        <span style={{ color: "#444", fontWeight: "700" }}>
+                          {(player.score || 0).toLocaleString()}
                         </span>
                       </div>
                     </div>
-                  ))}
+                  )) : (
+                    <div style={{ textAlign: "center", color: "#888", fontSize: "0.9rem", marginTop: "1rem" }}>
+                      Belum ada pemain di peringkat ini.
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -552,7 +591,7 @@ export default function TopicDetail({
                   setQuestionCount(val);
                 }}
                 min={1}
-                max={GAME_SETTINGS.questionLimits[difficulty]}
+                max={maxQuestions}
                 style={{
                   width: "80px",
                   padding: "8px 12px",
@@ -566,14 +605,14 @@ export default function TopicDetail({
                 }}
               />
               <span style={{ color: "#a0a5b5", fontSize: "0.8rem" }}>
-                (Maks: {GAME_SETTINGS.questionLimits[difficulty]})
+                (Maks: {maxQuestions})
               </span>
             </div>
 
             {/* Mulai Button */}
             {typeof questionCount === "number" &&
             questionCount > 0 &&
-            questionCount <= GAME_SETTINGS.questionLimits[difficulty] ? (
+            questionCount <= maxQuestions ? (
               <Link
                 href={`/dialog/${resolvedParams.id}?level=${difficulty.toLowerCase()}&count=${questionCount}`}
                 style={{ textDecoration: "none", marginTop: "0.5rem" }}
