@@ -26,6 +26,11 @@ export default function RegisterPage() {
       return;
     }
 
+    if (password.length < 8) {
+      toast.error("Password minimal harus 8 karakter!");
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -43,13 +48,28 @@ export default function RegisterPage() {
       }).then((data) => {
         return data.data;
       }).catch((err) => {
-        let detailMsg = '';
-        if (err.data) {
-          detailMsg = typeof err.data === 'object' ? JSON.stringify(err.data) : err.data;
-        } else {
-          detailMsg = err.message || JSON.stringify(err);
+        let errorMsg = 'Terjadi kesalahan saat mendaftar.';
+        
+        if (err.data && Array.isArray(err.data)) {
+          const firstError = err.data[0];
+          if (firstError?.field) {
+             errorMsg = `Validasi gagal pada kolom ${firstError.field}: ${firstError.message}`;
+          }
+        } else if (err.message) {
+          if (err.message.toLowerCase().includes('duplicate key') || err.message.includes('23505')) {
+             if (err.message.toLowerCase().includes('email')) {
+               errorMsg = 'Gagal: Email ini sudah terdaftar.';
+             } else if (err.message.toLowerCase().includes('username')) {
+               errorMsg = 'Gagal: Username ini sudah digunakan.';
+             } else {
+               errorMsg = 'Gagal: Email atau username sudah terdaftar.';
+             }
+          } else {
+             errorMsg = err.message;
+          }
         }
-        throw new Error(`Error: ${detailMsg}`);
+        
+        throw new Error(errorMsg);
       });
 
       await toast.promise(registerReq, {
@@ -106,14 +126,23 @@ export default function RegisterPage() {
           disabled={isSubmitting}
         />
 
-        <TextInput 
-          label="Password"
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Masukkan password anda"
-          disabled={isSubmitting}
-        />
+        <div style={{ position: 'relative' }}>
+          <TextInput 
+            label="Password"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Masukkan password anda"
+            disabled={isSubmitting}
+            minLength={8}
+            required
+          />
+          {password.length > 0 && password.length < 8 && (
+            <span style={{ color: '#ff477e', fontSize: '0.75rem', marginTop: '4px', display: 'block' }}>
+              Minimal 8 karakter
+            </span>
+          )}
+        </div>
 
         <SelectInput 
           label="Gender"

@@ -19,7 +19,7 @@ export default function ClassroomPage() {
     const fetchClassrooms = async () => {
       try {
         const result = await fetchApi("/api/v1/classrooms/me");
-        setClassrooms(result.data || result || []);
+        setClassrooms(Array.isArray(result.data) ? result.data : []);
       } catch (err: any) {
         setError(err.message || "Gagal mengambil data kelas");
       } finally {
@@ -106,9 +106,22 @@ export default function ClassroomPage() {
               gap: "2rem",
             }}
           >
-            {classrooms.map((cls: any) => (
-              <ClassroomCard key={cls.id} cls={cls} role={userRole} />
-            ))}
+            {Array.isArray(classrooms) && classrooms.length > 0 ? (
+              classrooms.map((cls: any) => (
+                <ClassroomCard key={cls.id} cls={cls} role={userRole} />
+              ))
+            ) : (
+              <div style={{ 
+                color: "white", 
+                textAlign: "center", 
+                gridColumn: "1 / -1", 
+                padding: "3rem 2rem", 
+                fontSize: "1.2rem", 
+                fontWeight: "500"
+              }}>
+                Anda belum bergabung dengan classroom manapun.
+              </div>
+            )}
           </div>
         </div>
       </div>

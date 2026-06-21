@@ -39,13 +39,18 @@ export default function LoginPage() {
         return data.data;
       }).catch((err) => {
         console.error("Backend Error Response:", err);
-        let detailMsg = '';
-        if (err.data) {
-          detailMsg = typeof err.data === 'object' ? JSON.stringify(err.data) : err.data;
-        } else {
-          detailMsg = err.message || JSON.stringify(err);
+        let errorMsg = 'Email/Username atau password salah.';
+        
+        if (err.data && Array.isArray(err.data)) {
+          const firstError = err.data[0];
+          if (firstError?.field) {
+             errorMsg = `Validasi gagal pada ${firstError.field}: ${firstError.message}`;
+          }
+        } else if (err.message) {
+          errorMsg = err.message;
         }
-        throw new Error(`Error: ${detailMsg}`);
+        
+        throw new Error(errorMsg);
       });
 
       const responseData = await toast.promise(loginReq, {

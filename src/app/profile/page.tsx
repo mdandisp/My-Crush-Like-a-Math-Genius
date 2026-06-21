@@ -7,16 +7,17 @@ import BackButton from '../../components/BackButton';
 import { fetchApi } from '../../utils/api';
 import ProfileCard from '../../components/profile/ProfileCard';
 import HistoryTable from '../../components/profile/HistoryTable';
+import ImageCropper from '../../components/profile/ImageCropper';
 import { AttemptHistory } from '../../types';
 
 export default function ProfilePage() {
   const [history, setHistory] = useState<AttemptHistory[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
-  const [isEditingName, setIsEditingName] = useState(false);
   const [userName, setUserName] = useState('Pemain');
-  const [tempName, setTempName] = useState('');
+  const [handle, setHandle] = useState('@username');
   const [avatarUrl, setAvatarUrl] = useState('/char-mc.png');
   const [userRole, setUserRole] = useState('Pelajar Kalkulus');
+  const [selectedFileUrl, setSelectedFileUrl] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchProfileData = async () => {
@@ -31,6 +32,7 @@ export default function ProfilePage() {
           const user = userRes.data;
           const fullName = user.first_name ? `${user.first_name} ${user.last_name || ''}`.trim() : user.username;
           setUserName(fullName || 'Pemain');
+          setHandle(`@${user.username}`);
           if (user.profile_picture_url) {
             setAvatarUrl(user.profile_picture_url);
           }
@@ -62,27 +64,44 @@ export default function ProfilePage() {
     fetchProfileData();
   }, []);
 
-  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        const base64String = reader.result as string;
-        setAvatarUrl(base64String);
-        // Implement upload to backend later
-        toast.success("Foto profil diubah sementara (belum tersimpan di server).");
+        setSelectedFileUrl(reader.result as string);
       };
       reader.readAsDataURL(file);
     }
+    // Reset the input so the same file can be selected again if needed
+    e.target.value = '';
   };
 
-  const handleSaveName = () => {
-    if (tempName.trim()) {
-      setUserName(tempName.trim());
-      // Implement update profile to backend later
-      toast.success("Nama diubah sementara (belum tersimpan di server).");
+  const handleCropComplete = async (croppedBlob: Blob) => {
+    setSelectedFileUrl(null); // Close the cropper modal immediately
+
+    // Preview locally first
+    const reader = new FileReader();
+    reader.onloadend = () => setAvatarUrl(reader.result as string);
+    reader.readAsDataURL(croppedBlob);
+
+    // Upload to backend
+    const formData = new FormData();
+    formData.append("profile_picture", croppedBlob, "avatar.jpg");
+
+    const loadingToast = toast.loading("Mengunggah foto profil...");
+    try {
+      const res = await fetchApi("/api/v1/users/me/profile-picture", {
+        method: "PATCH",
+        body: formData,
+      });
+      if (res.data?.profile_picture_url) {
+         setAvatarUrl(res.data.profile_picture_url);
+      }
+      toast.success("Foto profil berhasil diperbarui!", { id: loadingToast });
+    } catch (error: any) {
+      toast.error(error.message || "Gagal mengunggah foto profil", { id: loadingToast });
     }
-    setIsEditingName(false);
   };
 
   const handleLogout = () => {
@@ -176,12 +195,8 @@ export default function ProfilePage() {
         <ProfileCard 
           avatarUrl={avatarUrl}
           handleAvatarChange={handleAvatarChange}
-          isEditingName={isEditingName}
-          tempName={tempName}
-          setTempName={setTempName}
-          handleSaveName={handleSaveName}
           userName={userName}
-          setIsEditingName={setIsEditingName}
+          handle={handle}
           userRole={userRole}
           handleLogout={handleLogout}
         />
@@ -189,6 +204,15 @@ export default function ProfilePage() {
         {/* History Table */}
         <HistoryTable history={history} />
       </div>
+
+      {/* Image Cropper Modal */}
+      {selectedFileUrl && (
+        <ImageCropper
+          imageSrc={selectedFileUrl}
+          onCancel={() => setSelectedFileUrl(null)}
+          onCropComplete={handleCropComplete}
+        />
+      )}
     </main>
   );
 }
