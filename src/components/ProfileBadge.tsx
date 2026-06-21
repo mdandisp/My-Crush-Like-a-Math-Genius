@@ -30,6 +30,9 @@ export default function ProfileBadge({ name = "Pemain 1", level, size = 'medium'
           if (user.profile_picture_url) {
             setAvatarUrl(user.profile_picture_url);
             localStorage.setItem('userAvatar', user.profile_picture_url);
+          } else {
+            setAvatarUrl('/char-mc.png');
+            localStorage.removeItem('userAvatar');
           }
         }
       } catch (err) {

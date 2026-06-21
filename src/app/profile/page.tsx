@@ -109,6 +109,8 @@ export default function ProfilePage() {
     document.cookie = "role=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
     localStorage.removeItem('userRole');
     localStorage.removeItem('userGender');
+    localStorage.removeItem('userName');
+    localStorage.removeItem('userAvatar');
     window.location.href = "/login";
   };
 
