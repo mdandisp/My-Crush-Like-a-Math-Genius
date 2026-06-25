@@ -1,7 +1,14 @@
 import Link from 'next/link';
 
+interface TopicData {
+  id: string;
+  name: string;
+  max_attempts: number;
+  level_settings?: any[];
+}
+
 interface TopicCardProps {
-  topic: any;
+  topic: TopicData;
   onDelete: (id: string, name: string) => void;
 }
 

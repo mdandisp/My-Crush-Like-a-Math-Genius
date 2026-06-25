@@ -1,11 +1,19 @@
 import { charactersData } from '../data/mockData';
 
+export interface Topic {
+  id: string;
+  name?: string;
+  created_at?: string | Date;
+  max_attempts?: number;
+  level_settings?: any[];
+}
+
 /**
  * Maps an array of backend topics to frontend characters consistently.
  * It filters the characters by target gender, sorts topics to maintain consistency,
  * and distributes characters among the topics using a modulo operation.
  */
-export function mapTopicsToCharacters(topics: any[], targetGender: 'cewe' | 'cowo') {
+export function mapTopicsToCharacters(topics: Topic[], targetGender: 'cewe' | 'cowo') {
   if (!topics || !Array.isArray(topics)) return [];
 
   // 1. Filter characters by gender
@@ -50,7 +58,7 @@ export function mapTopicsToCharacters(topics: any[], targetGender: 'cewe' | 'cow
 /**
  * Helper to find a specific character for a given topic ID
  */
-export function getCharacterForTopic(topicId: string, topics: any[], targetGender: 'cewe' | 'cowo') {
+export function getCharacterForTopic(topicId: string, topics: Topic[], targetGender: 'cewe' | 'cowo') {
   const mapped = mapTopicsToCharacters(topics, targetGender);
   return mapped.find(m => m.topicId === topicId) || null;
 }

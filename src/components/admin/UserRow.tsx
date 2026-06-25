@@ -1,8 +1,22 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 
+interface UserData {
+  id?: string;
+  user_id?: string;
+  first_name?: string;
+  last_name?: string;
+  username?: string;
+  name?: string;
+  email?: string;
+  gender?: string;
+  role?: string;
+  profile_picture_url?: string;
+  user?: UserData;
+}
+
 interface UserRowProps {
-  user: any;
+  user: UserData;
   isLastRow: boolean;
 }
 
@@ -11,10 +25,11 @@ export default function UserRow({ user, isLastRow }: UserRowProps) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
   }, []);
 
-  const getDisplayName = (player: any) => {
+  const getDisplayName = (player: UserData) => {
     const p = player.user || player;
     if (p.first_name) {
       return `${p.first_name} ${p.last_name || ''}`.trim();
@@ -31,8 +46,6 @@ export default function UserRow({ user, isLastRow }: UserRowProps) {
   const genderDisplay = genderRaw === 'male' ? 'Laki-laki (♂)' : genderRaw === 'female' ? 'Perempuan (♀)' : '-';
   const email = p.email || user.email || '-';
   const role = p.role || user.role || '-';
-  const username = p.username || user.username || '-';
-  const userId = p.id || user.user_id || user.id || '-';
 
   return (
     <>

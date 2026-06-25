@@ -1,7 +1,9 @@
 const optionColors = ['#ff69b4', '#ff1493', '#00bfff', '#ffb347', '#2ecc71'];
 
+import { Option } from '../../types';
+
 interface AnswerGridProps {
-  options: any[];
+  options: Option[];
   selectedAnswer: string | null;
   setSelectedAnswer: (id: string) => void;
   isSubmitting: boolean;
@@ -15,7 +17,7 @@ export default function AnswerGrid({ options, selectedAnswer, setSelectedAnswer,
       flexWrap: 'nowrap',
       justifyContent: 'space-between'
     }}>
-      {options?.map((opt: any, i: number) => (
+      {options?.map((opt: Option, i: number) => (
         <button
           key={opt.id}
           className="quiz-option-btn"
@@ -46,7 +48,7 @@ export default function AnswerGrid({ options, selectedAnswer, setSelectedAnswer,
             opacity: isSubmitting ? 0.8 : 1
           }}
         >
-          {opt.content}
+          {opt.text || (opt as any).content}
         </button>
       ))}
     </div>

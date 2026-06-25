@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import BackButton from "../../../../../components/BackButton";
@@ -17,6 +17,42 @@ export default function editClassroomPage() {
     cover_img: null as File | null,
     wallpaper_img: null as File | null,
   });
+  const [existingCover, setExistingCover] = useState<string | null>(null);
+  const [existingWallpaper, setExistingWallpaper] = useState<string | null>(null);
+  const [removeCover, setRemoveCover] = useState(false);
+  const [removeWallpaper, setRemoveWallpaper] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!id) return;
+
+    const fetchClassroom = async () => {
+      try {
+        const result = await fetchApi(`/api/v1/classrooms/${id}`);
+        const data = result.data || result;
+        setFormData({
+          id: data.id || "",
+          name: data.name || "",
+          description: data.description || "",
+          enable_external_invite: !!data.is_external_invite_enable || !!data.enable_external_invite,
+          status: data.status || "",
+          cover_img: null,
+          wallpaper_img: null,
+        });
+        setExistingCover(data.cover_img || null);
+        setExistingWallpaper(data.wallpaper_img || null);
+      } catch (error) {
+        console.error("Gagal mengambil data kelas:", error);
+        alert("Gagal memuat data kelas.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchClassroom();
+  }, [id]);
+
+  if (loading) return <div style={{ color: "white" }}>Memuat data...</div>;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,12 +73,17 @@ export default function editClassroomPage() {
     // console.log("ID yang dikirim:", id);
     // console.log("URL lengkap:", `/api/v1/classrooms/${id}`);
 
-    // 3. Masukkan file jika ada
+    // 3. Masukkan file jika ada, atau tanda hapus
     if (formData.cover_img) {
       payload.append("cover_img", formData.cover_img);
+    } else if (removeCover) {
+      payload.append("delete_cover_img", "true");
     }
+
     if (formData.wallpaper_img) {
       payload.append("wallpaper_img", formData.wallpaper_img);
+    } else if (removeWallpaper) {
+      payload.append("delete_wallpaper_img", "true");
     }
 
     try {
@@ -83,14 +124,122 @@ export default function editClassroomPage() {
     }
   };
 
-  const fileInputStyle: React.CSSProperties = {
-    width: "100%",
-    padding: "10px",
-    borderRadius: "8px",
-    backgroundColor: "rgba(0,0,0,0.3)",
-    border: "1px solid rgba(255,255,255,0.2)",
-    color: "#a0a5b5",
-    cursor: "pointer",
+  const renderImageUpload = (
+    label: string,
+    existingUrl: string | null,
+    newFile: File | null,
+    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void,
+    onRemove: () => void
+  ) => {
+    const previewUrl = newFile ? URL.createObjectURL(newFile) : existingUrl;
+
+    return (
+      <div>
+        <label
+          style={{
+            display: "block",
+            color: "#a0a5b5",
+            marginBottom: "8px",
+            fontWeight: "600",
+          }}
+        >
+          {label}
+        </label>
+        <label
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            width: "100%",
+            height: "160px",
+            borderRadius: "12px",
+            border: "2px dashed rgba(255,255,255,0.2)",
+            backgroundColor: "rgba(0,0,0,0.3)",
+            cursor: "pointer",
+            overflow: "hidden",
+            position: "relative",
+            transition: "all 0.2s",
+          }}
+          onMouseOver={(e) => (e.currentTarget.style.borderColor = "#ff477e")}
+          onMouseOut={(e) => (e.currentTarget.style.borderColor = "rgba(255,255,255,0.2)")}
+        >
+          {previewUrl ? (
+            <>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={previewUrl} alt={label} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+              <div
+                style={{
+                  position: "absolute",
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  background: "linear-gradient(to top, rgba(0,0,0,0.8), transparent)",
+                  color: "white",
+                  textAlign: "center",
+                  padding: "20px 8px 8px 8px",
+                  fontSize: "0.85rem",
+                  fontWeight: "500",
+                }}
+              >
+                Ubah Gambar
+              </div>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  onRemove();
+                }}
+                style={{
+                  position: "absolute",
+                  top: "8px",
+                  right: "8px",
+                  backgroundColor: "rgba(0,0,0,0.6)",
+                  backdropFilter: "blur(4px)",
+                  border: "none",
+                  borderRadius: "50%",
+                  width: "32px",
+                  height: "32px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  cursor: "pointer",
+                  color: "#ef4444",
+                  transition: "all 0.2s",
+                  zIndex: 10,
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.backgroundColor = "#ef4444";
+                  e.currentTarget.style.color = "white";
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.backgroundColor = "rgba(0,0,0,0.6)";
+                  e.currentTarget.style.color = "#ef4444";
+                }}
+                title="Hapus Gambar"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M3 6h18"></path>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                </svg>
+              </button>
+            </>
+          ) : (
+            <div style={{ color: "#a0a5b5", textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center" }}>
+              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: "12px", opacity: 0.7 }}>
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                <polyline points="21 15 16 10 5 21"></polyline>
+              </svg>
+              <div style={{ fontSize: "0.9rem", fontWeight: "500" }}>Pilih Gambar</div>
+              <div style={{ fontSize: "0.75rem", opacity: 0.6, marginTop: "4px" }}>PNG, JPG, WebP</div>
+            </div>
+          )}
+          <input type="file" accept="image/*" onChange={onChange} style={{ display: "none" }} />
+        </label>
+      </div>
+    );
   };
 
   return (
@@ -266,103 +415,98 @@ export default function editClassroomPage() {
               gap: "1rem",
             }}
           >
-            <div>
-              <label
-                style={{
-                  display: "block",
-                  color: "#a0a5b5",
-                  marginBottom: "8px",
-                  fontWeight: "600",
-                }}
-              >
-                Cover
-              </label>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    cover_img: e.target.files?.[0] || null,
-                  })
-                }
-                style={fileInputStyle}
-              />
-            </div>
-            <div>
-              <label
-                style={{
-                  display: "block",
-                  color: "#a0a5b5",
-                  marginBottom: "8px",
-                  fontWeight: "600",
-                }}
-              >
-                Wallpaper
-              </label>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    wallpaper_img: e.target.files?.[0] || null,
-                  })
-                }
-                style={fileInputStyle}
-              />
-            </div>
+            {renderImageUpload(
+              "Cover",
+              existingCover,
+              formData.cover_img,
+              (e) => {
+                setFormData({ ...formData, cover_img: e.target.files?.[0] || null });
+                if (e.target.files?.[0]) setRemoveCover(false);
+              },
+              () => {
+                setFormData({ ...formData, cover_img: null });
+                setExistingCover(null);
+                setRemoveCover(true);
+              }
+            )}
+            
+            {renderImageUpload(
+              "Wallpaper",
+              existingWallpaper,
+              formData.wallpaper_img,
+              (e) => {
+                setFormData({ ...formData, wallpaper_img: e.target.files?.[0] || null });
+                if (e.target.files?.[0]) setRemoveWallpaper(false);
+              },
+              () => {
+                setFormData({ ...formData, wallpaper_img: null });
+                setExistingWallpaper(null);
+                setRemoveWallpaper(true);
+              }
+            )}
           </div>
 
-          <button
-            type="submit"
-            style={{
-              marginTop: "1rem",
-              padding: "14px",
-              backgroundColor: "#22c55e",
-              color: "white",
-              border: "none",
-              borderRadius: "8px",
-              fontWeight: "600",
-              fontSize: "1.1rem",
-              cursor: "pointer",
-              transition: "all 0.2s",
-              boxShadow: "0 4px 15px rgba(34, 197, 94, 0.3)",
-            }}
-            onMouseOver={(e) =>
-              (e.currentTarget.style.backgroundColor = "#16a34a")
-            }
-            onMouseOut={(e) =>
-              (e.currentTarget.style.backgroundColor = "#22c55e")
-            }
-          >
-            Simpan Classroom
-          </button>
+          <div style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            alignItems: "center",
+            gap: "1rem",
+            marginTop: "2rem",
+            paddingTop: "1.5rem",
+            borderTop: "1px solid rgba(255,255,255,0.05)"
+          }}>
+            <button
+              type="button"
+              onClick={handleDelete}
+              style={{
+                padding: "10px 20px",
+                backgroundColor: "rgba(239, 68, 68, 0.05)",
+                color: "#ef4444",
+                border: "1px solid rgba(239, 68, 68, 0.2)",
+                borderRadius: "8px",
+                fontWeight: "500",
+                fontSize: "0.95rem",
+                cursor: "pointer",
+                transition: "all 0.2s",
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.backgroundColor = "rgba(239, 68, 68, 0.15)";
+                e.currentTarget.style.borderColor = "rgba(239, 68, 68, 0.4)";
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.backgroundColor = "rgba(239, 68, 68, 0.05)";
+                e.currentTarget.style.borderColor = "rgba(239, 68, 68, 0.2)";
+              }}
+            >
+              Hapus Kelas
+            </button>
 
-          <button
-            type="button" // Penting: gunakan 'button' agar tidak memicu submit form
-            onClick={handleDelete}
-            style={{
-              marginTop: "1rem",
-              padding: "14px",
-              backgroundColor: "#ef4444", // Warna merah untuk hapus
-              color: "white",
-              border: "none",
-              borderRadius: "8px",
-              fontWeight: "600",
-              fontSize: "1.1rem",
-              cursor: "pointer",
-              transition: "all 0.2s",
-            }}
-            onMouseOver={(e) =>
-              (e.currentTarget.style.backgroundColor = "#dc2626")
-            }
-            onMouseOut={(e) =>
-              (e.currentTarget.style.backgroundColor = "#ef4444")
-            }
-          >
-            Hapus Classroom
-          </button>
+            <button
+              type="submit"
+              style={{
+                padding: "10px 24px",
+                background: "linear-gradient(135deg, #ff477e, #ff6b9d)",
+                color: "white",
+                border: "none",
+                borderRadius: "8px",
+                fontWeight: "600",
+                fontSize: "0.95rem",
+                cursor: "pointer",
+                transition: "all 0.2s",
+                boxShadow: "0 4px 15px rgba(255, 71, 126, 0.3)",
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.transform = "translateY(-1px)";
+                e.currentTarget.style.boxShadow = "0 6px 20px rgba(255, 71, 126, 0.4)";
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.transform = "translateY(0)";
+                e.currentTarget.style.boxShadow = "0 4px 15px rgba(255, 71, 126, 0.3)";
+              }}
+            >
+              Simpan Perubahan
+            </button>
+          </div>
         </form>
       </div>
     </div>
