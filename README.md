@@ -56,8 +56,8 @@ http://localhost:3000
 ## 🔑 Akses Admin (Testing)
 
 Jika Backend Anda telah dikonfigurasi dengan *seeder* default, Anda bisa mencoba login ke Admin Panel menggunakan:
-- **Email:** `admin@mail.com`
-- **Password:** `admin123`
+- **Email:** `superadmin123@mail.com`
+- **Password:** `string`
 
 ---
 
