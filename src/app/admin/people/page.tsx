@@ -96,7 +96,7 @@ export default function AdminPeoplePage() {
 
         {/* Table Rows */}
         {currentUsers.map((user, idx) => (
-          <UserRow key={user.id} user={user} isLastRow={idx === currentUsers.length - 1} />
+          <UserRow key={user.id || user.user_id || `user-${idx}`} user={user} isLastRow={idx === currentUsers.length - 1} />
         ))}
         </div>
       </div>

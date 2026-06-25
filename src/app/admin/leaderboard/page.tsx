@@ -55,7 +55,8 @@ export default function AdminLeaderboardPage() {
           try {
             // Fetch topics for this classroom
             const topicsRes = await fetchApi(`/api/v1/topics?classroomId=${cls.id}`);
-            let topics = topicsRes.data || topicsRes || [];
+            const rawTopics = topicsRes.data || topicsRes;
+            let topics = Array.isArray(rawTopics) ? rawTopics : [];
 
             // Filter by topic if a specific topic is selected
             if (filterTopic !== 'ALL') {
@@ -66,7 +67,8 @@ export default function AdminLeaderboardPage() {
               try {
                 // Fetch leaderboard for this classroom & topic
                 const lbRes = await fetchApi(`/api/v1/leaderboard?classroomId=${cls.id}&topicId=${topic.id}`);
-                const data = lbRes.data || lbRes || [];
+                const rawData = lbRes.data || lbRes;
+                const data = Array.isArray(rawData) ? rawData : [];
 
                 for (const player of data) {
                   const uid = player.user_id;
