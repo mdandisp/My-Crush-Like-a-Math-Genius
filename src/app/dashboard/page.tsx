@@ -116,7 +116,7 @@ export default function ClassroomPage() {
         }}
       >
         {/* Title */}
-        <div style={{ textAlign: "center", marginBottom: "4rem" }}>
+        <div className="desktop-only" style={{ textAlign: "center", marginBottom: "4rem", width: "100%", justifyContent: "center" }}>
           <h1
             className="animate-fade-in"
             style={{
