@@ -39,6 +39,7 @@ function QuizContent({ params }: { params: Promise<{ id: string }> }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoadingInfo, setIsLoadingInfo] = useState(true);
   const [totalQuestions, setTotalQuestions] = useState(requestedCount);
+  const [correctAnswer, setCorrectAnswer] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [attemptDetails, setAttemptDetails] = useState<AttemptSession | null>(
     null,
@@ -132,6 +133,7 @@ function QuizContent({ params }: { params: Promise<{ id: string }> }) {
   };
 
   const startQuiz = async () => {
+    setCorrectAnswer(0);
     if (topicInfo?.remaining_attempts === 0) {
       toast.error("Batas percobaan untuk kuis ini sudah habis.");
       return;
@@ -215,6 +217,7 @@ function QuizContent({ params }: { params: Promise<{ id: string }> }) {
       const { isCorrect, isFinished, score: finalScore } = res.data;
 
       if (isCorrect) {
+        setCorrectAnswer((prev) => prev + 1);
         toast.success("Jawaban Benar!");
       } else {
         toast.error("Jawaban Salah!");
@@ -661,6 +664,7 @@ function QuizContent({ params }: { params: Promise<{ id: string }> }) {
           {/* === FINISHED STATE === */}
           {quizState === "finished" && (
             <QuizResultModal
+              correct={correctAnswer}
               score={score}
               totalQ={totalQ}
               timeLeft={timeLeft}
