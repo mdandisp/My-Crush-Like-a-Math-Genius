@@ -5,6 +5,7 @@ interface TopicData {
   name: string;
   max_attempts: number;
   level_settings?: any[];
+  classroom_id?: string;
 }
 
 interface TopicCardProps {
@@ -40,7 +41,7 @@ export default function TopicCard({ topic, onDelete }: TopicCardProps) {
       </div>
 
       <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: 'auto' }}>
-        <Link href={`/admin/topics/edit?id=${topic.id}`} style={{ flex: 1, textDecoration: 'none', minWidth: '80px' }}>
+        <Link href={`/admin/topics/edit?id=${topic.id}${topic.classroom_id ? `&classroomId=${topic.classroom_id}` : ''}`} style={{ flex: 1, textDecoration: 'none', minWidth: '80px' }}>
           <button style={{
             width: '100%', padding: '8px',
             backgroundColor: 'transparent', color: 'white',
@@ -52,7 +53,7 @@ export default function TopicCard({ topic, onDelete }: TopicCardProps) {
             Edit
           </button>
         </Link>
-        <Link href={`/admin/topics/${topic.id}/questions`} style={{ flex: 1, textDecoration: 'none', minWidth: '80px' }}>
+        <Link href={`/admin/topics/${topic.id}/questions${topic.classroom_id ? `?classroomId=${topic.classroom_id}` : ''}`} style={{ flex: 1, textDecoration: 'none', minWidth: '80px' }}>
           <button style={{
             width: '100%', padding: '8px',
             backgroundColor: 'rgba(240, 148, 77, 0.2)', color: '#f0944d',

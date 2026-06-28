@@ -29,6 +29,7 @@ export default function EditQuestionsPage({
   const [questions, setQuestions] = useState<QuestionDraft[]>([]);
   const [activeTab, setActiveTab] = useState(0);
   const [topicName, setTopicName] = useState<string>("");
+  const [classroomId, setClassroomId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchAllQuestions = async (topicId: string) => {
@@ -52,6 +53,10 @@ export default function EditQuestionsPage({
   };
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const cId = params.get('classroomId');
+    if (cId) setClassroomId(cId);
+
     const fetchData = async () => {
       try {
         setIsLoading(true);
@@ -269,7 +274,7 @@ export default function EditQuestionsPage({
           }}
         >
           <BackButton
-            href="/admin/classrooms/"
+            href={classroomId ? `/admin/classrooms/${classroomId}` : "/admin/classrooms/"}
             style={{ marginBottom: "1rem" }}
           />
           <h2 style={{ color: "white", fontSize: "1.2rem", margin: 0 }}>
