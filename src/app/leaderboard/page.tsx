@@ -209,9 +209,9 @@ export default function LeaderboardPage() {
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   margin: '0 auto 10px', fontSize: '2rem', fontWeight: '800', color: 'white',
                   boxShadow: '0 4px 15px rgba(0,0,0,0.3)',
-                  backgroundImage: rankings[1].profile_picture_url ? `url(${rankings[1].profile_picture_url})` : 'none',
+                  backgroundImage: `url(${rankings[1].profile_picture_url || '/char-mc.png'})`,
                   backgroundSize: 'cover', backgroundPosition: 'center'
-                }}>{!rankings[1].profile_picture_url && '2'}</div>
+                }}></div>
                 <p style={{ color: 'white', fontWeight: '600', fontSize: '0.9rem' }}>{getDisplayName(rankings[1])}</p>
                 <p style={{ color: '#ff477e', fontWeight: '700', fontSize: '0.85rem' }}>{(rankings[1].score || 0).toLocaleString()}</p>
               </div>
@@ -227,9 +227,9 @@ export default function LeaderboardPage() {
                   margin: '0 auto 10px', fontSize: '2.5rem', fontWeight: '800', color: 'white',
                   boxShadow: '0 6px 25px rgba(255, 215, 0, 0.5)',
                   border: '3px solid rgba(255,255,255,0.4)',
-                  backgroundImage: rankings[0].profile_picture_url ? `url(${rankings[0].profile_picture_url})` : 'none',
+                  backgroundImage: `url(${rankings[0].profile_picture_url || '/char-mc.png'})`,
                   backgroundSize: 'cover', backgroundPosition: 'center'
-                }}>{!rankings[0].profile_picture_url && '👑'}</div>
+                }}></div>
                 <p style={{ color: 'white', fontWeight: '700', fontSize: '1.1rem' }}>{getDisplayName(rankings[0])}</p>
                 <p style={{ color: '#FFD700', fontWeight: '800', fontSize: '1rem' }}>{(rankings[0].score || 0).toLocaleString()}</p>
               </div>
@@ -244,9 +244,9 @@ export default function LeaderboardPage() {
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   margin: '0 auto 10px', fontSize: '2rem', fontWeight: '800', color: 'white',
                   boxShadow: '0 4px 15px rgba(0,0,0,0.3)',
-                  backgroundImage: rankings[2].profile_picture_url ? `url(${rankings[2].profile_picture_url})` : 'none',
+                  backgroundImage: `url(${rankings[2].profile_picture_url || '/char-mc.png'})`,
                   backgroundSize: 'cover', backgroundPosition: 'center'
-                }}>{!rankings[2].profile_picture_url && '3'}</div>
+                }}></div>
                 <p style={{ color: 'white', fontWeight: '600', fontSize: '0.9rem' }}>{getDisplayName(rankings[2])}</p>
                 <p style={{ color: '#CD7F32', fontWeight: '700', fontSize: '0.85rem' }}>{(rankings[2].score || 0).toLocaleString()}</p>
               </div>
@@ -282,13 +282,11 @@ export default function LeaderboardPage() {
                     }}>
                       {player.rank || (idx + 4)}
                     </div>
-                    {player.profile_picture_url && (
-                      <div style={{
-                        width: '32px', height: '32px', borderRadius: '50%',
-                        backgroundImage: `url(${player.profile_picture_url})`,
-                        backgroundSize: 'cover', backgroundPosition: 'center', flexShrink: 0
-                      }}></div>
-                    )}
+                    <div style={{
+                      width: '32px', height: '32px', borderRadius: '50%',
+                      backgroundImage: `url(${player.profile_picture_url || '/char-mc.png'})`,
+                      backgroundSize: 'cover', backgroundPosition: 'center', flexShrink: 0
+                    }}></div>
                     <span style={{ flex: 1, color: 'white', fontSize: '0.95rem', fontWeight: '500' }}>
                       {getDisplayName(player)}
                     </span>

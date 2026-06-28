@@ -8,6 +8,7 @@ import { fetchApi } from '../../utils/api';
 import ProfileCard from '../../components/profile/ProfileCard';
 import HistoryTable from '../../components/profile/HistoryTable';
 import ImageCropper from '../../components/profile/ImageCropper';
+import GlobalSpinner from '../../components/common/GlobalSpinner';
 import { AttemptHistory } from '../../types';
 
 export default function ProfilePage() {
@@ -104,7 +105,13 @@ export default function ProfilePage() {
     }
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      // Panggil endpoint logout di backend untuk menghancurkan token di server
+      await fetchApi('/api/v1/authentication/logout', { method: 'POST' });
+    } catch (err) {
+      console.warn("Backend logout failed, proceeding with local logout", err);
+    }
     document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
     document.cookie = "role=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
     localStorage.removeItem('userRole');
@@ -121,23 +128,9 @@ export default function ProfilePage() {
         backgroundImage: 'url("/bg_kelas.png")',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
-        position: 'relative',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center'
+        position: 'relative'
       }}>
-        <div style={{
-          position: 'absolute',
-          top: 0, left: 0, right: 0, bottom: 0,
-          backgroundColor: 'rgba(15, 16, 21, 0.6)',
-          zIndex: 0
-        }}></div>
-        <div style={{ position: 'relative', zIndex: 5, color: 'white', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
-          <div style={{ width: '40px', height: '40px', border: '4px solid rgba(255, 71, 126, 0.3)', borderTopColor: '#ff477e', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
-          <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-          <p style={{ fontWeight: '500', letterSpacing: '1px' }}>Memuat Profil...</p>
-        </div>
+        <GlobalSpinner message="Memuat Profil..." />
       </main>
     );
   }

@@ -36,16 +36,20 @@ export default function AdminSidebar() {
           zIndex: 50,
         }}
       >
-        <h2
-          style={{
-            color: "white",
-            margin: 0,
-            fontSize: "1.2rem",
-            fontWeight: "700",
-          }}
-        >
-          Admin Panel
-        </h2>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/favicon.ico" alt="Logo" style={{ width: '32px', height: '32px', objectFit: 'contain', filter: 'drop-shadow(0 2px 5px rgba(255, 71, 126, 0.4))' }} />
+          <h2
+            style={{
+              color: "white",
+              margin: 0,
+              fontSize: "1.2rem",
+              fontWeight: "700",
+            }}
+          >
+            Admin Panel
+          </h2>
+        </div>
         <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           style={{

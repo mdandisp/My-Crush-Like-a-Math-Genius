@@ -53,14 +53,121 @@ export default function CreateClassroomPage() {
     }
   };
 
-  const fileInputStyle: React.CSSProperties = {
-    width: "100%",
-    padding: "10px",
-    borderRadius: "8px",
-    backgroundColor: "rgba(0,0,0,0.3)",
-    border: "1px solid rgba(255,255,255,0.2)",
-    color: "#a0a5b5",
-    cursor: "pointer",
+  const renderImageUpload = (
+    label: string,
+    newFile: File | null,
+    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void,
+    onRemove: () => void
+  ) => {
+    const previewUrl = newFile ? URL.createObjectURL(newFile) : null;
+
+    return (
+      <div>
+        <label
+          style={{
+            display: "block",
+            color: "#a0a5b5",
+            marginBottom: "8px",
+            fontWeight: "600",
+          }}
+        >
+          {label}
+        </label>
+        <label
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            width: "100%",
+            height: "160px",
+            borderRadius: "12px",
+            border: "2px dashed rgba(255,255,255,0.2)",
+            backgroundColor: "rgba(0,0,0,0.3)",
+            cursor: "pointer",
+            overflow: "hidden",
+            position: "relative",
+            transition: "all 0.2s",
+          }}
+          onMouseOver={(e) => (e.currentTarget.style.borderColor = "#ff477e")}
+          onMouseOut={(e) => (e.currentTarget.style.borderColor = "rgba(255,255,255,0.2)")}
+        >
+          {previewUrl ? (
+            <>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={previewUrl} alt={label} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+              <div
+                style={{
+                  position: "absolute",
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  background: "linear-gradient(to top, rgba(0,0,0,0.8), transparent)",
+                  color: "white",
+                  textAlign: "center",
+                  padding: "20px 8px 8px 8px",
+                  fontSize: "0.85rem",
+                  fontWeight: "500",
+                }}
+              >
+                Ubah Gambar
+              </div>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  onRemove();
+                }}
+                style={{
+                  position: "absolute",
+                  top: "8px",
+                  right: "8px",
+                  backgroundColor: "rgba(0,0,0,0.6)",
+                  backdropFilter: "blur(4px)",
+                  border: "none",
+                  borderRadius: "50%",
+                  width: "32px",
+                  height: "32px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  cursor: "pointer",
+                  color: "#ef4444",
+                  transition: "all 0.2s",
+                  zIndex: 10,
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.backgroundColor = "#ef4444";
+                  e.currentTarget.style.color = "white";
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.backgroundColor = "rgba(0,0,0,0.6)";
+                  e.currentTarget.style.color = "#ef4444";
+                }}
+                title="Hapus Gambar"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M3 6h18"></path>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                </svg>
+              </button>
+            </>
+          ) : (
+            <div style={{ color: "#a0a5b5", textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center" }}>
+              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: "12px", opacity: 0.7 }}>
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                <polyline points="21 15 16 10 5 21"></polyline>
+              </svg>
+              <div style={{ fontSize: "0.9rem", fontWeight: "500" }}>Pilih Gambar</div>
+              <div style={{ fontSize: "0.75rem", opacity: 0.6, marginTop: "4px" }}>PNG, JPG, WebP</div>
+            </div>
+          )}
+          <input type="file" accept="image/*" onChange={onChange} style={{ display: "none" }} />
+        </label>
+      </div>
+    );
   };
 
   return (
@@ -200,52 +307,18 @@ export default function CreateClassroomPage() {
               gap: "1rem",
             }}
           >
-            <div>
-              <label
-                style={{
-                  display: "block",
-                  color: "#a0a5b5",
-                  marginBottom: "8px",
-                  fontWeight: "600",
-                }}
-              >
-                Cover
-              </label>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    cover_img: e.target.files?.[0] || null,
-                  })
-                }
-                style={fileInputStyle}
-              />
-            </div>
-            <div>
-              <label
-                style={{
-                  display: "block",
-                  color: "#a0a5b5",
-                  marginBottom: "8px",
-                  fontWeight: "600",
-                }}
-              >
-                Wallpaper
-              </label>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    wallpaper_img: e.target.files?.[0] || null,
-                  })
-                }
-                style={fileInputStyle}
-              />
-            </div>
+            {renderImageUpload(
+              "Cover",
+              formData.cover_img,
+              (e) => setFormData({ ...formData, cover_img: e.target.files?.[0] || null }),
+              () => setFormData({ ...formData, cover_img: null })
+            )}
+            {renderImageUpload(
+              "Wallpaper",
+              formData.wallpaper_img,
+              (e) => setFormData({ ...formData, wallpaper_img: e.target.files?.[0] || null }),
+              () => setFormData({ ...formData, wallpaper_img: null })
+            )}
           </div>
 
           <button

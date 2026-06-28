@@ -52,9 +52,6 @@ export default function ClassroomPage() {
         errorMsg = "Kode kelas tidak ditemukan";
       }
       toast.error(errorMsg);
-      console.log(err);
-      console.log(err.response);
-      console.log(err.message);
     } finally {
       setIsSubmitting(false);
     }

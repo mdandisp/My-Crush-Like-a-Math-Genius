@@ -1,3 +1,5 @@
+import GlobalSpinner from '../components/common/GlobalSpinner';
+
 export default function GlobalLoading() {
   return (
     <div style={{
@@ -6,29 +8,10 @@ export default function GlobalLoading() {
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
-      justifyContent: 'center'
+      justifyContent: 'center',
+      position: 'relative'
     }}>
-      <div style={{
-        width: '50px',
-        height: '50px',
-        border: '4px solid rgba(255, 71, 126, 0.2)',
-        borderTopColor: '#ff477e',
-        borderRadius: '50%',
-        animation: 'spin 1s linear infinite'
-      }}></div>
-      <style>{`
-        @keyframes spin {
-          to { transform: rotate(360deg); }
-        }
-      `}</style>
-      <p style={{
-        color: 'white',
-        marginTop: '1rem',
-        fontWeight: 'bold',
-        letterSpacing: '2px'
-      }}>
-        MEMUAT...
-      </p>
+      <GlobalSpinner message="MEMUAT..." isAbsolute={false} />
     </div>
   );
 }

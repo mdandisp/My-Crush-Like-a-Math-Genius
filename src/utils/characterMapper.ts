@@ -1,11 +1,12 @@
 import { charactersData } from '../data/mockData';
+import { LevelSetting } from '../types';
 
 export interface Topic {
   id: string;
   name?: string;
   created_at?: string | Date;
   max_attempts?: number;
-  level_settings?: any[];
+  level_settings?: LevelSetting[];
 }
 
 /**

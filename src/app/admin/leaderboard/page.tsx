@@ -70,17 +70,29 @@ export default function AdminLeaderboardPage() {
                 const rawData = lbRes.data || lbRes;
                 const data = Array.isArray(rawData) ? rawData : [];
 
+                const normalizeTopicName = (name: string) => {
+                  const match = name.match(/\((.*?)\)/);
+                  return match ? match[1].trim() : name.trim();
+                };
+                const normalizedName = normalizeTopicName(topic.name);
+
                 for (const player of data) {
                   const uid = player.user_id;
                   if (!userScores.has(uid)) {
                     userScores.set(uid, {
                       ...player,
-                      topicScores: [{ topicId: topic.id, topicName: topic.name, score: player.score || 0 }]
+                      topicScores: [{ topicName: normalizedName, score: player.score || 0 }]
                     });
                   } else {
                     const existing = userScores.get(uid);
                     existing.score = (existing.score || 0) + (player.score || 0);
-                    existing.topicScores.push({ topicId: topic.id, topicName: topic.name, score: player.score || 0 });
+                    
+                    const existingTopic = existing.topicScores.find((ts: any) => ts.topicName === normalizedName);
+                    if (existingTopic) {
+                      existingTopic.score += (player.score || 0);
+                    } else {
+                      existing.topicScores.push({ topicName: normalizedName, score: player.score || 0 });
+                    }
                   }
                 }
               } catch (e) {
@@ -144,47 +156,43 @@ export default function AdminLeaderboardPage() {
           </p>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <label style={{ color: '#a0a5b5', fontSize: '0.85rem' }}>Filter Kelas:</label>
-            <select
-              value={filterClass}
-              onChange={(e) => {
-                setFilterClass(e.target.value);
-                setCurrentPage(1); // Reset page on filter change
-              }}
-              style={{
-                padding: '8px 16px', borderRadius: '8px', backgroundColor: 'rgba(0,0,0,0.3)', color: 'white',
-                border: '1px solid rgba(255,255,255,0.2)', outline: 'none', cursor: 'pointer'
-              }}
-            >
-              <option value="ALL">Semua Kelas</option>
-              {classrooms.map(cls => (
-                <option key={cls.id} value={cls.id}>{cls.name}</option>
-              ))}
-            </select>
-          </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', gap: '10px', alignItems: 'center', minWidth: '280px', maxWidth: '400px', flex: 1 }}>
+          <label style={{ color: '#a0a5b5', fontSize: '0.85rem', whiteSpace: 'nowrap' }}>Filter Kelas:</label>
+          <select
+            value={filterClass}
+            onChange={(e) => {
+              setFilterClass(e.target.value);
+              setCurrentPage(1); // Reset page on filter change
+            }}
+            style={{
+              width: '100%', padding: '8px 16px', borderRadius: '8px', backgroundColor: 'rgba(0,0,0,0.3)', color: 'white',
+              border: '1px solid rgba(255,255,255,0.2)', outline: 'none', cursor: 'pointer'
+            }}
+          >
+            <option value="ALL">Semua Kelas</option>
+            {classrooms.map(cls => (
+              <option key={cls.id} value={cls.id}>{cls.name}</option>
+            ))}
+          </select>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <label style={{ color: '#a0a5b5', fontSize: '0.85rem' }}>Filter Materi:</label>
-            <select
-              value={filterTopic}
-              onChange={(e) => {
-                setFilterTopic(e.target.value);
-                setCurrentPage(1);
-              }}
-              disabled={filterClass === 'ALL'}
-              style={{
-                padding: '8px 16px', borderRadius: '8px', backgroundColor: filterClass === 'ALL' ? 'rgba(0,0,0,0.1)' : 'rgba(0,0,0,0.3)', color: filterClass === 'ALL' ? 'rgba(255,255,255,0.3)' : 'white',
-                border: '1px solid rgba(255,255,255,0.2)', outline: 'none', cursor: filterClass === 'ALL' ? 'not-allowed' : 'pointer'
-              }}
-            >
-              <option value="ALL">Semua Materi</option>
-              {topicsList.map(topic => (
-                <option key={topic.id} value={topic.id}>{topic.name}</option>
-              ))}
-            </select>
-          </div>
+          <label style={{ color: '#a0a5b5', fontSize: '0.85rem', whiteSpace: 'nowrap' }}>Filter Materi:</label>
+          <select
+            value={filterTopic}
+            onChange={(e) => {
+              setFilterTopic(e.target.value);
+              setCurrentPage(1);
+            }}
+            disabled={filterClass === 'ALL'}
+            style={{
+              width: '100%', padding: '8px 16px', borderRadius: '8px', backgroundColor: filterClass === 'ALL' ? 'rgba(0,0,0,0.1)' : 'rgba(0,0,0,0.3)', color: filterClass === 'ALL' ? 'rgba(255,255,255,0.3)' : 'white',
+              border: '1px solid rgba(255,255,255,0.2)', outline: 'none', cursor: filterClass === 'ALL' ? 'not-allowed' : 'pointer'
+            }}
+          >
+            <option value="ALL">Semua Materi</option>
+            {topicsList.map(topic => (
+              <option key={topic.id} value={topic.id}>{topic.name}</option>
+            ))}
+          </select>
         </div>
       </div>
 
@@ -249,7 +257,7 @@ export default function AdminLeaderboardPage() {
                       <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: '#64748b', backgroundImage: `url("${avatarUrl}")`, backgroundSize: 'cover', backgroundPosition: 'top' }}></div>
                       <div>
                         <p style={{ color: 'white', fontWeight: '600', fontSize: '0.95rem', margin: '0 0 2px 0' }}>{displayName}</p>
-                        <p style={{ color: '#a0a5b5', fontSize: '0.8rem', margin: 0 }}>{player.email || '-'}</p>
+                        <p style={{ color: '#a0a5b5', fontSize: '0.8rem', margin: 0 }}>{player.username ? `@${player.username}` : (player.name ? `@${player.name}` : (player.email || '-'))}</p>
                       </div>
                     </div>
 

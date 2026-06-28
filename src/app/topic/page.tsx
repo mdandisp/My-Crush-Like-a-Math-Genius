@@ -6,6 +6,7 @@ import { charactersData } from "../../data/mockData";
 import ProfileBadge from "../../components/ProfileBadge";
 import { fetchApi } from "../../utils/api";
 import { mapTopicsToCharacters } from "../../utils/characterMapper";
+import GlobalSpinner from "../../components/common/GlobalSpinner";
 import DashboardHeader from "../../components/dashboard/DashboardHeader";
 import CharacterCard from "../../components/dashboard/CharacterCard";
 import { Character } from "../../types";
@@ -43,7 +44,7 @@ export default function DashboardPage() {
 
         const res = await fetchApi(`/api/v1/topics?classroomId=${classroomId}`);
 
-        const mapped = res.data.map((topic: any) => ({
+        const mapped = res.data.map((topic: { id: string; name: string; female_normal_img: string; male_normal_img: string }) => ({
           topicId: topic.id,
           topicName: topic.name,
           image:
@@ -53,7 +54,7 @@ export default function DashboardPage() {
         }));
 
         setDisplayedCharacters(mapped);
-      } catch (err: any) {
+      } catch (err) {
         console.error("Gagal memuat topik:", err);
       } finally {
         setIsLoaded(true);
@@ -129,31 +130,7 @@ export default function DashboardPage() {
           }}
         >
           {!isLoaded ? (
-            <div
-              style={{
-                color: "white",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: "1rem",
-                marginTop: "4rem",
-              }}
-            >
-              <div
-                style={{
-                  width: "40px",
-                  height: "40px",
-                  border: "4px solid rgba(255, 71, 126, 0.3)",
-                  borderTopColor: "#ff477e",
-                  borderRadius: "50%",
-                  animation: "spin 1s linear infinite",
-                }}
-              ></div>
-              <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-              <p style={{ fontWeight: "500", letterSpacing: "1px" }}>
-                Memuat Topik...
-              </p>
-            </div>
+            <GlobalSpinner message="Memuat Topik..." isAbsolute={false} />
           ) : displayedCharacters.length === 0 ? (
             <div
               style={{ color: "white", textAlign: "center", marginTop: "2rem" }}
