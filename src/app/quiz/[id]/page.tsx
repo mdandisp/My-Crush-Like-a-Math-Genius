@@ -95,11 +95,23 @@ function QuizContent({ params }: { params: Promise<{ id: string }> }) {
         const topicsRes = await fetchApi(`/api/v1/topics/${resolvedParams.id}`);
         const topic = topicsRes.data;
 
+        const lowerTopicName = topic.name.toLowerCase();
+        let concept = topic.name;
+        if (lowerTopicName.includes('limit')) concept = 'Limit';
+        else if (lowerTopicName.includes('integral')) concept = 'Integral';
+        else if (lowerTopicName.includes('turunan')) concept = 'Turunan';
+        else if (lowerTopicName.includes('trigono')) concept = 'Trigonometri';
+        else {
+          const match = topic.name.match(/\(([^)]+)\)/);
+          if (match) concept = match[1];
+        }
+
         const character = {
           id: topic.id,
           topicId: topic.id,
           topicName: topic.name,
           name: topic.name,
+          concept: concept,
           info: topic.description,
 
           image: isFemale ? topic.male_normal_img : topic.female_normal_img,
