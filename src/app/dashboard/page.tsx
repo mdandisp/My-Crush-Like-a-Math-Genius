@@ -163,8 +163,36 @@ export default function ClassroomPage() {
                   : "0 4px 14px rgba(255, 71, 126, 0.4)",
               }}
             >
-              {isSubmitting ? "Memeriksa..." : "Masuk"}
+              {isSubmitting ? "Memeriksa..." : "Masuk dengan Kode"}
             </button>
+
+            <Link href="/dashboard/classrooms" style={{ textDecoration: "none", width: "100%" }}>
+              <button
+                type="button"
+                style={{
+                  width: "100%",
+                  padding: "12px",
+                  backgroundColor: "rgba(255, 71, 126, 0.1)",
+                  color: "#ff477e",
+                  border: "2px solid rgba(255, 71, 126, 0.5)",
+                  borderRadius: "8px",
+                  fontWeight: "600",
+                  fontSize: "1rem",
+                  cursor: "pointer",
+                  transition: "all 0.2s ease",
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.backgroundColor = "rgba(255, 71, 126, 0.2)";
+                  e.currentTarget.style.borderColor = "#ff477e";
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.backgroundColor = "rgba(255, 71, 126, 0.1)";
+                  e.currentTarget.style.borderColor = "rgba(255, 71, 126, 0.5)";
+                }}
+              >
+                Lihat Kelas Saya
+              </button>
+            </Link>
           </form>
         </JoinLayout>
       </div>

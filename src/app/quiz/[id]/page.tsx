@@ -45,6 +45,45 @@ function QuizContent({ params }: { params: Promise<{ id: string }> }) {
     null,
   );
 
+  // --- SESSION PERSISTENCE ---
+  const clearSession = () => {
+    localStorage.removeItem(`quizSession_${resolvedParams.id}`);
+  };
+
+  useEffect(() => {
+    if (quizState === "playing" && sessionId) {
+      localStorage.setItem(
+        `quizSession_${resolvedParams.id}`,
+        JSON.stringify({
+          sessionId,
+          totalQuestions,
+          currentQ,
+          correctAnswer,
+        })
+      );
+    }
+  }, [quizState, sessionId, totalQuestions, currentQ, correctAnswer]);
+
+  useEffect(() => {
+    if (!isLoadingInfo && quizState === "info") {
+      const cached = localStorage.getItem(`quizSession_${resolvedParams.id}`);
+      if (cached) {
+        try {
+          const data = JSON.parse(cached);
+          setSessionId(data.sessionId);
+          setTotalQuestions(data.totalQuestions);
+          setCurrentQ(data.currentQ);
+          setCorrectAnswer(data.correctAnswer);
+          setQuizState("playing");
+          fetchNextQuestion(data.sessionId);
+        } catch (e) {
+          clearSession();
+        }
+      }
+    }
+  }, [isLoadingInfo, quizState]);
+  // ---------------------------
+
   // Pre-flight check
   useEffect(() => {
     const fetchInfo = async () => {
@@ -91,6 +130,30 @@ function QuizContent({ params }: { params: Promise<{ id: string }> }) {
           `/api/v1/topics/${resolvedParams.id}/attempts/info`,
         );
         setTopicInfo(res.data);
+
+        // Check leaderboard for dating image
+        const cid = localStorage.getItem("classroomId") || "";
+        if (cid) {
+          try {
+            const [lbRes, userRes] = await Promise.all([
+              fetchApi(`/api/v1/leaderboard?classroomId=${cid}&topicId=${resolvedParams.id}`),
+              fetchApi('/api/v1/users/me')
+            ]);
+
+            if (lbRes.data && userRes.data && lbRes.data.length > 0) {
+              const rank1User = lbRes.data[0];
+              if (rank1User.user_id === userRes.data.id || rank1User.username === userRes.data.username) {
+                setCharacter((prev: any) => ({
+                  ...prev,
+                  image: prev.datingImage || prev.image,
+                  dialog: prev.datingDialog || prev.dialog
+                }));
+              }
+            }
+          } catch (e) {
+            console.warn("Gagal mengecek rank user:", e);
+          }
+        }
       } catch (err: any) {
         toast.error(err.message || "Gagal mengambil info kuis");
         router.push("/dashboard");
@@ -104,26 +167,56 @@ function QuizContent({ params }: { params: Promise<{ id: string }> }) {
 
   // Timer
   useEffect(() => {
-    if (quizState === "playing" && timeLeft > 0) {
-      timerRef.current = setInterval(() => {
-        setTimeLeft((prev) => {
-          if (prev <= 1) {
-            clearInterval(timerRef.current!);
-            handleTimeout();
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
+    if (quizState === "playing" && !isSubmitting) {
+      if (timeLeft > 0) {
+        const timer = setTimeout(() => {
+          setTimeLeft(timeLeft - 1);
+        }, 1000);
+        return () => clearTimeout(timer);
+      } else if (timeLeft === 0) {
+        handleTimeout();
+      }
     }
-    return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
-    };
-  }, [quizState, timeLeft]);
+  }, [quizState, timeLeft, isSubmitting]);
 
-  const handleTimeout = () => {
-    toast.error("Waktu habis!");
-    if (sessionId) fetchAttemptDetails(sessionId);
+  const handleTimeout = async () => {
+    toast.error("Waktu habis untuk soal ini!");
+    if (!sessionId || !currentQuestion) return;
+
+    try {
+      setIsSubmitting(true);
+      // Submit jawaban kosong agar backend bisa mencatat salah / skip
+      const payload = {
+        attemptSessionId: sessionId,
+        questionId: currentQuestion.id,
+        answerId: "00000000-0000-0000-0000-000000000000", // dummy fallback
+        attempt_session_id: sessionId,
+        question_id: currentQuestion.id,
+        answer_id: "00000000-0000-0000-0000-000000000000",
+      };
+
+      const res = await fetchApi("/api/v1/attempts/submit-answer", {
+        method: "POST",
+        body: JSON.stringify(payload),
+      });
+
+      const is_finished = res.data.isFinished !== undefined ? res.data.isFinished : res.data.is_finished;
+      if (is_finished) {
+        if (timerRef.current) clearInterval(timerRef.current);
+        setQuizState("finished");
+        clearSession();
+        fetchAttemptDetails(sessionId);
+      } else {
+        setCurrentQ((prev) => prev + 1);
+        await fetchNextQuestion(sessionId);
+      }
+    } catch (e) {
+      // Jika error (misal backend nolak id kosong), paksa panggil next question
+      setCurrentQ((prev) => prev + 1);
+      await fetchNextQuestion(sessionId);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const formatTime = (s: number) => {
@@ -163,10 +256,8 @@ function QuizContent({ params }: { params: Promise<{ id: string }> }) {
       const session = res.data;
       setSessionId(session.id);
 
-      const expiresAt = new Date(session.expiresAt).getTime();
-      const now = new Date().getTime();
-      const diffSeconds = Math.floor((expiresAt - now) / 1000);
-      setTimeLeft(diffSeconds > 0 ? diffSeconds : 0);
+      // Timer per-question will be set in fetchNextQuestion
+      setTimeLeft(30);
 
       setQuizState("playing");
       setTotalQuestions(session.requestedQuestions);
@@ -183,15 +274,30 @@ function QuizContent({ params }: { params: Promise<{ id: string }> }) {
     try {
       setIsSubmitting(true);
       const res = await fetchApi(`/api/v1/attempts/${sid}/next-question`);
-      if (res.data.isFinished) {
+
+      // Backend might return snake_case or camelCase
+      const is_finished = res.data.isFinished !== undefined ? res.data.isFinished : res.data.is_finished;
+
+      if (is_finished) {
+        if (timerRef.current) clearInterval(timerRef.current);
+        setQuizState("finished");
+        clearSession();
+        // We might not have the final score here if we timed out on the last question, 
+        // but we can try fetching it.
         fetchAttemptDetails(sid);
       } else {
         setCurrentQuestion(res.data.question);
         setSelectedAnswer(null);
+        // Reset timer based on question duration
+        setTimeLeft(res.data.question.time_limit || res.data.question.timeLimit || 30);
       }
     } catch (err: any) {
       if (err.status === 400 && err.message === "Session Expired") {
-        handleTimeout();
+        toast.error("Waktu sesi kuis secara keseluruhan telah berakhir!");
+        if (timerRef.current) clearInterval(timerRef.current);
+        setQuizState("finished");
+        clearSession();
+        fetchAttemptDetails(sid);
       } else {
         toast.error(err.message || "Gagal mengambil soal");
       }
@@ -201,33 +307,43 @@ function QuizContent({ params }: { params: Promise<{ id: string }> }) {
   };
 
   const submitAnswer = async () => {
-    if (!selectedAnswer || !sessionId || !currentQuestion) return;
+    if (!selectedAnswer || !sessionId || !currentQuestion || isSubmitting) return;
 
     try {
       setIsSubmitting(true);
+      const payload = {
+        attemptSessionId: sessionId,
+        questionId: currentQuestion.id,
+        answerId: selectedAnswer,
+        attempt_session_id: sessionId,
+        question_id: currentQuestion.id,
+        answer_id: selectedAnswer,
+      };
+
       const res = await fetchApi("/api/v1/attempts/submit-answer", {
         method: "POST",
-        body: JSON.stringify({
-          attemptSessionId: sessionId,
-          questionId: currentQuestion.id,
-          answerId: selectedAnswer,
-        }),
+        body: JSON.stringify(payload),
       });
 
-      const { isCorrect, isFinished, score: finalScore } = res.data;
+      const is_correct = res.data.isCorrect !== undefined ? res.data.isCorrect : res.data.is_correct;
+      const is_finished = res.data.isFinished !== undefined ? res.data.isFinished : res.data.is_finished;
+      const finalScore = res.data.score;
 
-      if (isCorrect) {
+      if (is_correct) {
         setCorrectAnswer((prev) => prev + 1);
         toast.success("Jawaban Benar!");
       } else {
         toast.error("Jawaban Salah!");
       }
 
-      if (isFinished) {
-        fetchAttemptDetails(sessionId);
+      if (is_finished) {
+        if (timerRef.current) clearInterval(timerRef.current);
+        setScore(finalScore || 0);
+        setQuizState("finished");
+        clearSession();
       } else {
         setCurrentQ((prev) => prev + 1);
-        fetchNextQuestion(sessionId);
+        await fetchNextQuestion(sessionId);
       }
     } catch (err: any) {
       if (err.status === 400 && err.message === "Session Expired") {
@@ -247,7 +363,8 @@ function QuizContent({ params }: { params: Promise<{ id: string }> }) {
       setAttemptDetails(res.data);
       setScore(res.data.score || 0);
     } catch (err: any) {
-      toast.error(err.message || "Gagal mengambil detail hasil kuis");
+
+      console.warn("fetchAttemptDetails failed:", err);
     }
   };
 
@@ -576,8 +693,8 @@ function QuizContent({ params }: { params: Promise<{ id: string }> }) {
                   style={{
                     opacity:
                       isLoadingInfo ||
-                      isSubmitting ||
-                      topicInfo?.remaining_attempts === 0
+                        isSubmitting ||
+                        topicInfo?.remaining_attempts === 0
                         ? 0.5
                         : 1,
                   }}

@@ -34,7 +34,7 @@ export default function QuestionDisplay({ content }: QuestionDisplayProps) {
           remarkPlugins={[remarkMath]}
           rehypePlugins={[rehypeKatex]}
         >
-          {content}
+          {content?.replace(/\$\$/g, '$').replace(/\\\\/g, '\\')}
         </ReactMarkdown>
       </div>
     </div>

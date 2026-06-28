@@ -108,7 +108,27 @@ export default function TopicDetail({
         const cid = localStorage.getItem("classroomId") || "";
         if (cid) {
           const lbRes = await fetchApi(`/api/v1/leaderboard?classroomId=${cid}&topicId=${resolvedParams.id}`);
-          if (lbRes.data) setRankings(lbRes.data);
+          if (lbRes.data) {
+            setRankings(lbRes.data);
+            
+            // Cek apakah user saat ini adalah peringkat 1
+            try {
+              const userRes = await fetchApi('/api/v1/users/me');
+              const currentUser = userRes.data;
+              if (currentUser && lbRes.data.length > 0) {
+                const rank1User = lbRes.data[0];
+                if (rank1User.user_id === currentUser.id || rank1User.username === currentUser.username) {
+                  setCharacter((prev: any) => ({
+                    ...prev,
+                    image: prev.datingImage || prev.image,
+                    dialog: prev.datingDialog || prev.dialog
+                  }));
+                }
+              }
+            } catch (e) {
+              console.warn("Gagal mengecek rank user:", e);
+            }
+          }
         }
 
         // setTopicInfo(attemptsRes.data);

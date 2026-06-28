@@ -84,12 +84,12 @@ export default function AdminPeoplePage() {
         <div style={{ minWidth: '800px' }}>
         {/* Table Header */}
         <div style={{
-          display: 'grid', gridTemplateColumns: '2fr 3fr 1fr 1fr 1fr',
+          display: 'grid', gridTemplateColumns: '3fr 4fr 2fr',
           padding: '16px 24px',
           backgroundColor: 'rgba(255,255,255,0.05)',
           borderBottom: '1px solid rgba(255,255,255,0.1)'
         }}>
-          {['Nama Lengkap', 'Email', 'Gender', 'Role', 'Aksi'].map(h => (
+          {['Nama Lengkap', 'Email', 'Role'].map(h => (
             <span key={h} style={{ color: '#ffffffff', fontSize: '0.85rem', fontWeight: '700', textTransform: 'uppercase' }}>{h}</span>
           ))}
         </div>

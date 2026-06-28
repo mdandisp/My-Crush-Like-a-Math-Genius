@@ -6,6 +6,10 @@ import { fetchApi } from "../../../../../utils/api";
 import BackButton from "../../../../../components/BackButton";
 import toast from "react-hot-toast";
 import { useParams } from "next/navigation";
+import ClickToEditMath from "../../../../../components/admin/ClickToEditMath";
+import ReactMarkdown from "react-markdown";
+import remarkMath from "remark-math";
+import rehypeKatex from "rehype-katex";
 
 interface QuestionDraft {
   id?: string;
@@ -328,18 +332,30 @@ export default function EditQuestionsPage({
                   {q.level}
                 </span>
               </div>
-              <p
+              <div
                 style={{
                   color: "#a0a5b5",
                   fontSize: "0.85rem",
                   margin: 0,
-                  whiteSpace: "nowrap",
+                  maxHeight: "3rem",
                   overflow: "hidden",
                   textOverflow: "ellipsis",
+                  display: "-webkit-box",
+                  WebkitLineClamp: 2,
+                  WebkitBoxOrient: "vertical",
                 }}
               >
-                {q.content || "Kosong..."}
-              </p>
+                {q.content ? (
+                  <ReactMarkdown
+                    remarkPlugins={[remarkMath]}
+                    rehypePlugins={[rehypeKatex]}
+                  >
+                    {q.content.replace(/\$\$/g, '$').replace(/\\\\/g, '\\')}
+                  </ReactMarkdown>
+                ) : (
+                  "Kosong..."
+                )}
+              </div>
             </div>
           ))}
           <button
@@ -467,24 +483,17 @@ export default function EditQuestionsPage({
               </div>
 
               {/* Teks Soal */}
-              <div>
-                <textarea
-                  placeholder="Ketik pertanyaan Anda di sini..."
+              <div style={{ display: "flex", flex: 1, minHeight: "150px" }}>
+                <ClickToEditMath
                   value={activeQ.content}
-                  onChange={(e) => handleUpdate("content", e.target.value)}
+                  onChange={(val) => handleUpdate("content", val)}
                   disabled={isLoading}
+                  placeholder="Ketik pertanyaan Anda di sini... (gunakan $ $ untuk matematika inline, atau block $$ $$)"
+                  autoFormatKatex={false}
                   style={{
-                    width: "100%",
-                    height: "150px",
-                    padding: "20px",
-                    borderRadius: "12px",
-                    backgroundColor: "rgba(0,0,0,0.3)",
-                    border: "1px solid rgba(255,255,255,0.2)",
-                    color: "white",
+                    height: "100%",
+                    minHeight: "150px",
                     fontSize: "1.2rem",
-                    outline: "none",
-                    resize: "none",
-                    textAlign: "center",
                   }}
                 />
               </div>
@@ -562,23 +571,18 @@ export default function EditQuestionsPage({
                       </div>
 
                       {/* Input Jawaban */}
-                      <textarea
+                      <ClickToEditMath
                         value={opt}
-                        onChange={(e) =>
-                          handleOptionChange(idx, e.target.value)
-                        }
+                        onChange={(val) => handleOptionChange(idx, val)}
                         disabled={isLoading}
                         placeholder={`Tambahkan opsi jawaban...`}
+                        autoFormatKatex={true}
                         style={{
                           flex: 1,
                           height: "100px",
-                          padding: "12px 16px",
                           backgroundColor: "transparent",
                           border: "none",
-                          color: "white",
                           fontSize: "1.1rem",
-                          outline: "none",
-                          resize: "none",
                         }}
                       />
                     </div>

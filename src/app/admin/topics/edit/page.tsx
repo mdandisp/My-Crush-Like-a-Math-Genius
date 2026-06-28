@@ -13,12 +13,14 @@ export default function EditTopicPage() {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    normal_image_female: '',
-    normal_image_male: '',
-    normal_dialog: '',
-    dating_image_female: '',
-    dating_image_male: '',
-    dating_dialog: '',
+    female_normal_img: '',
+    male_normal_img: '',
+    female_dating_img: '',
+    male_dating_img: '',
+    female_normal_dialog: '',
+    male_normal_dialog: '',
+    female_dating_dialog: '',
+    male_dating_dialog: '',
     max_attempts: 3,
     level_settings: {
       Easy: { plus: 100, minus: 10 },
@@ -56,6 +58,15 @@ export default function EditTopicPage() {
             setFormData(prev => ({
               ...prev,
               title: char.name || '',
+              description: char.description || '',
+              female_normal_img: char.female_normal_img || '',
+              male_normal_img: char.male_normal_img || '',
+              female_dating_img: char.female_dating_img || '',
+              male_dating_img: char.male_dating_img || '',
+              female_normal_dialog: char.female_normal_dialog || '',
+              male_normal_dialog: char.male_normal_dialog || '',
+              female_dating_dialog: char.female_dating_dialog || '',
+              male_dating_dialog: char.male_dating_dialog || '',
               max_attempts: char.max_attempts || 3,
               level_settings: newLevelSettings
             }));
@@ -86,9 +97,17 @@ export default function EditTopicPage() {
 
     const payload = {
       name: formData.title,
+      description: formData.description,
+      female_normal_img: formData.female_normal_img,
+      male_normal_img: formData.male_normal_img,
+      female_dating_img: formData.female_dating_img,
+      male_dating_img: formData.male_dating_img,
+      female_normal_dialog: formData.female_normal_dialog,
+      male_normal_dialog: formData.male_normal_dialog,
+      female_dating_dialog: formData.female_dating_dialog,
+      male_dating_dialog: formData.male_dating_dialog,
       max_attempts: formData.max_attempts,
       level_settings: levelSettingsArray
-      // Note: description, images, dialogs are currently not supported by backend schema
     };
 
     try {
@@ -163,8 +182,62 @@ export default function EditTopicPage() {
             <input type="text" style={inputStyle} value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} required disabled={isLoading} />
           </div>
           <div>
+            <label style={{ display: 'block', color: '#a0a5b5', marginBottom: '8px', fontWeight: '600' }}>Deskripsi Karakter/Topik</label>
+            <textarea style={{ ...inputStyle, minHeight: '80px', resize: 'vertical' }} value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} disabled={isLoading} />
+          </div>
+          <div>
             <label style={{ display: 'block', color: '#a0a5b5', marginBottom: '8px', fontWeight: '600' }}>Maksimal Attempt per Murid</label>
             <input type="number" min={1} style={inputStyle} value={formData.max_attempts} onChange={(e) => setFormData({ ...formData, max_attempts: parseInt(e.target.value) || 1 })} required disabled={isLoading} />
+          </div>
+        </div>
+
+        {/* Character Images */}
+        <div style={sectionStyle}>
+          <h2 style={{ color: '#00bfff', fontSize: '1.2rem', margin: '0 0 10px 0' }}>Gambar Karakter (URL)</h2>
+          <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+            <div style={{ flex: 1, minWidth: '250px' }}>
+              <label style={{ display: 'block', color: '#a0a5b5', marginBottom: '8px', fontWeight: '600' }}>Waifu (Perempuan) Normal</label>
+              <input type="text" style={inputStyle} placeholder="https://..." value={formData.female_normal_img} onChange={(e) => setFormData({ ...formData, female_normal_img: e.target.value })} disabled={isLoading} />
+            </div>
+            <div style={{ flex: 1, minWidth: '250px' }}>
+              <label style={{ display: 'block', color: '#a0a5b5', marginBottom: '8px', fontWeight: '600' }}>Waifu Dating (Rank 1)</label>
+              <input type="text" style={inputStyle} placeholder="https://..." value={formData.female_dating_img} onChange={(e) => setFormData({ ...formData, female_dating_img: e.target.value })} disabled={isLoading} />
+            </div>
+          </div>
+          <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', marginTop: '1rem' }}>
+            <div style={{ flex: 1, minWidth: '250px' }}>
+              <label style={{ display: 'block', color: '#a0a5b5', marginBottom: '8px', fontWeight: '600' }}>Husbu (Laki-laki) Normal</label>
+              <input type="text" style={inputStyle} placeholder="https://..." value={formData.male_normal_img} onChange={(e) => setFormData({ ...formData, male_normal_img: e.target.value })} disabled={isLoading} />
+            </div>
+            <div style={{ flex: 1, minWidth: '250px' }}>
+              <label style={{ display: 'block', color: '#a0a5b5', marginBottom: '8px', fontWeight: '600' }}>Husbu Dating (Rank 1)</label>
+              <input type="text" style={inputStyle} placeholder="https://..." value={formData.male_dating_img} onChange={(e) => setFormData({ ...formData, male_dating_img: e.target.value })} disabled={isLoading} />
+            </div>
+          </div>
+        </div>
+
+        {/* Character Dialogs */}
+        <div style={sectionStyle}>
+          <h2 style={{ color: '#ffb347', fontSize: '1.2rem', margin: '0 0 10px 0' }}>Dialog Karakter</h2>
+          <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+            <div style={{ flex: 1, minWidth: '250px' }}>
+              <label style={{ display: 'block', color: '#a0a5b5', marginBottom: '8px', fontWeight: '600' }}>Waifu (Perempuan) Normal</label>
+              <textarea style={{ ...inputStyle, minHeight: '60px', resize: 'vertical' }} value={formData.female_normal_dialog} onChange={(e) => setFormData({ ...formData, female_normal_dialog: e.target.value })} disabled={isLoading} />
+            </div>
+            <div style={{ flex: 1, minWidth: '250px' }}>
+              <label style={{ display: 'block', color: '#a0a5b5', marginBottom: '8px', fontWeight: '600' }}>Waifu Dating (Rank 1)</label>
+              <textarea style={{ ...inputStyle, minHeight: '60px', resize: 'vertical' }} value={formData.female_dating_dialog} onChange={(e) => setFormData({ ...formData, female_dating_dialog: e.target.value })} disabled={isLoading} />
+            </div>
+          </div>
+          <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', marginTop: '1rem' }}>
+            <div style={{ flex: 1, minWidth: '250px' }}>
+              <label style={{ display: 'block', color: '#a0a5b5', marginBottom: '8px', fontWeight: '600' }}>Husbu (Laki-laki) Normal</label>
+              <textarea style={{ ...inputStyle, minHeight: '60px', resize: 'vertical' }} value={formData.male_normal_dialog} onChange={(e) => setFormData({ ...formData, male_normal_dialog: e.target.value })} disabled={isLoading} />
+            </div>
+            <div style={{ flex: 1, minWidth: '250px' }}>
+              <label style={{ display: 'block', color: '#a0a5b5', marginBottom: '8px', fontWeight: '600' }}>Husbu Dating (Rank 1)</label>
+              <textarea style={{ ...inputStyle, minHeight: '60px', resize: 'vertical' }} value={formData.male_dating_dialog} onChange={(e) => setFormData({ ...formData, male_dating_dialog: e.target.value })} disabled={isLoading} />
+            </div>
           </div>
         </div>
 

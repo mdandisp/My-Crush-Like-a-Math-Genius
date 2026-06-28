@@ -144,39 +144,48 @@ export default function LeaderboardPage() {
         </div>
       </div>
 
-      {/* Filter Pills */}
+      {/* Filter Dropdown */}
       <div style={{
         position: 'relative', zIndex: 5, marginTop: '1.5rem',
-        display: 'flex', gap: '0.5rem',
-        backgroundColor: 'rgba(255,255,255,0.1)',
-        backdropFilter: 'blur(10px)',
-        padding: '6px',
-        borderRadius: '12px',
-        border: '1px solid rgba(255,255,255,0.15)',
-        flexWrap: 'wrap',
-        justifyContent: 'center',
-        maxWidth: '90%'
+        width: '90%', maxWidth: '400px'
       }}>
-        {filters.map(f => (
-          <button
-            key={f.key}
-            onClick={() => setFilter(f.key)}
-            style={{
-              padding: '8px 20px',
-              borderRadius: '8px',
-              border: 'none',
-              backgroundColor: filter === f.key ? '#ff477e' : 'transparent',
-              color: 'white',
-              fontWeight: '600',
-              fontSize: '0.85rem',
-              cursor: 'pointer',
-              transition: 'all 0.2s',
-              boxShadow: filter === f.key ? '0 4px 12px rgba(255,71,126,0.4)' : 'none'
-            }}
-          >
-            {f.label}
-          </button>
-        ))}
+        <select
+          value={filter}
+          onChange={(e) => setFilter(e.target.value)}
+          style={{
+            width: '100%',
+            padding: '12px 20px',
+            backgroundColor: 'rgba(30, 33, 48, 0.8)',
+            backdropFilter: 'blur(10px)',
+            color: 'white',
+            border: '1px solid rgba(255,255,255,0.2)',
+            borderRadius: '12px',
+            fontSize: '0.95rem',
+            fontWeight: '600',
+            cursor: 'pointer',
+            appearance: 'none',
+            outline: 'none',
+            boxShadow: '0 4px 15px rgba(0,0,0,0.2)'
+          }}
+        >
+          {filters.map(f => (
+            <option key={f.key} value={f.key} style={{ color: 'white', backgroundColor: '#1e2130' }}>
+              {f.label}
+            </option>
+          ))}
+        </select>
+        {/* Custom Arrow */}
+        <div style={{
+          position: 'absolute',
+          right: '16px',
+          top: '50%',
+          transform: 'translateY(-50%)',
+          pointerEvents: 'none',
+          color: 'white',
+          fontSize: '0.8rem'
+        }}>
+          ▼
+        </div>
       </div>
 
       {isLoading ? (

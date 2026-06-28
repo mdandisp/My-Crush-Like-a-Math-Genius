@@ -1,6 +1,9 @@
 const optionColors = ['#ff69b4', '#ff1493', '#00bfff', '#ffb347', '#2ecc71'];
 
 import { Option } from '../../types';
+import ReactMarkdown from "react-markdown";
+import remarkMath from "remark-math";
+import rehypeKatex from "rehype-katex";
 
 interface AnswerGridProps {
   options: Option[];
@@ -48,7 +51,15 @@ export default function AnswerGrid({ options, selectedAnswer, setSelectedAnswer,
             opacity: isSubmitting ? 0.8 : 1
           }}
         >
-          {opt.text || (opt as any).content}
+          <ReactMarkdown
+            remarkPlugins={[remarkMath]}
+            rehypePlugins={[rehypeKatex]}
+          >
+            {(() => {
+              const text = (opt.text || (opt as any).content) || '';
+              return text ? `$${text.replace(/\$/g, '').replace(/\\\\/g, '\\')}$` : '';
+            })()}
+          </ReactMarkdown>
         </button>
       ))}
     </div>

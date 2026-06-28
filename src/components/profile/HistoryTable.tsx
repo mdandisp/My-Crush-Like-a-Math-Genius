@@ -16,17 +16,17 @@ export default function HistoryTable({ history }: HistoryTableProps) {
           <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
             <thead>
               <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.2)', color: '#f0944d' }}>
-                <th style={{ padding: '12px' }}>Tanggal</th>
+                <th style={{ padding: '12px', whiteSpace: 'nowrap' }}>Tanggal</th>
                 <th style={{ padding: '12px' }}>Topik</th>
                 <th style={{ padding: '12px' }}>Level</th>
                 <th style={{ padding: '12px' }}>Soal</th>
-                <th style={{ padding: '12px' }}>Skor</th>
+                <th style={{ padding: '12px', whiteSpace: 'nowrap' }}>Skor</th>
               </tr>
             </thead>
             <tbody>
               {history.map((h, i) => (
                 <tr key={h.id || i} style={{ borderBottom: '1px solid rgba(255,255,255,0.1)', color: 'white' }}>
-                  <td style={{ padding: '12px' }}>
+                  <td style={{ padding: '12px', whiteSpace: 'nowrap' }}>
                     {new Date(h.startedAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
                   </td>
                   <td style={{ padding: '12px' }}>{h.topicName}</td>
@@ -39,7 +39,7 @@ export default function HistoryTable({ history }: HistoryTableProps) {
                     </span>
                   </td>
                   <td style={{ padding: '12px' }}>{h.requestedQuestions}</td>
-                  <td style={{ padding: '12px', fontWeight: 'bold', color: h.score === h.requestedQuestions ? '#22c55e' : 'white' }}>
+                  <td style={{ padding: '12px', fontWeight: 'bold', whiteSpace: 'nowrap', color: h.score === h.requestedQuestions ? '#22c55e' : 'white' }}>
                     {h.score !== null ? h.score : '-'} / {h.requestedQuestions}
                   </td>
                 </tr>

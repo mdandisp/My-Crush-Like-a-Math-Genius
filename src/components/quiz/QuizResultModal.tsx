@@ -97,11 +97,24 @@ export default function QuizResultModal({
           style={{
             color: "#a0a5b5",
             fontSize: "1.1rem",
-            marginBottom: "0.5rem",
+            marginBottom: "1.5rem",
           }}
         >
           Jawaban Benar
         </p>
+
+        {/* Display Score */}
+        <div style={{ marginBottom: "1.5rem" }}>
+          <p style={{ color: "#a0a5b5", fontSize: "0.9rem", margin: "0 0 5px 0" }}>Skor yang Diperoleh</p>
+          <div style={{
+            fontSize: "2rem",
+            fontWeight: "800",
+            color: "#FFD700",
+            textShadow: "0 2px 10px rgba(255, 215, 0, 0.3)"
+          }}>
+            {score.toLocaleString()}
+          </div>
+        </div>
         <p style={{ color: "#a0a5b5", fontSize: "0.9rem" }}>
           Waktu tersisa: {formatTime(timeLeft)}
         </p>

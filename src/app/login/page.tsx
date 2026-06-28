@@ -85,7 +85,7 @@ export default function LoginPage() {
         localStorage.setItem('userGender', user.gender);
       }
       
-      window.location.href = '/dashboard';
+      router.push('/dashboard');
     } catch (error) {
       // Error sudah ditangani oleh toast.promise
     } finally {
