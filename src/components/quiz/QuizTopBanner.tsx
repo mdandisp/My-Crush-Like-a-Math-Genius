@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 interface QuizTopBannerProps {
   quizState: string;
   character: any;
@@ -38,45 +40,74 @@ export default function QuizTopBanner({ quizState, character, totalQ, currentQ, 
           </h1>
         </div>
 
-        {/* Top Right Floating Character Button (Info) - Mobile Only */}
-        <button
-          className="mobile-only"
-          onClick={() => setShowCharacterModal(true)}
-          style={{
-            position: 'absolute',
-            right: '1.5rem',
-            top: '50%',
-            transform: 'translateY(-50%)',
-            width: '45px',
-            height: '45px',
-            borderRadius: '50%',
-            backgroundColor: 'rgba(255, 255, 255, 0.1)',
-            backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(255,255,255,0.4)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
-            transition: 'all 0.2s',
-            color: 'white'
-          }}
-          onMouseOver={(e) => {
-            e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.25)';
-            e.currentTarget.style.transform = 'translateY(-50%) scale(1.1)';
-          }}
-          onMouseOut={(e) => {
-            e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
-            e.currentTarget.style.transform = 'translateY(-50%) scale(1)';
-          }}
-          title={`Lihat Detail ${character.name}`}
-        >
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="12" cy="12" r="10"></circle>
-            <line x1="12" y1="8" x2="12" y2="12"></line>
-            <line x1="12" y1="16" x2="12.01" y2="16"></line>
-          </svg>
-        </button>
+        {/* Top Right Floating Button - Mobile Only */}
+        {quizState === "finished" ? (
+          <Link
+            href="/leaderboard"
+            className="mobile-only"
+            style={{
+              position: 'absolute',
+              right: '1.5rem',
+              top: '50%',
+              transform: 'translateY(-50%)',
+              width: '45px',
+              height: '45px',
+              borderRadius: '50%',
+              backgroundColor: 'rgba(255, 255, 255, 0.15)',
+              border: '2px solid rgba(255,255,255,0.3)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '1.2rem',
+              cursor: 'pointer',
+              boxShadow: '0 4px 10px rgba(0,0,0,0.2)',
+              textDecoration: 'none',
+              zIndex: 60,
+            }}
+          >
+            🏆
+          </Link>
+        ) : (
+          <button
+            className="mobile-only"
+            onClick={() => setShowCharacterModal(true)}
+            style={{
+              position: 'absolute',
+              right: '1.5rem',
+              top: '50%',
+              transform: 'translateY(-50%)',
+              width: '45px',
+              height: '45px',
+              borderRadius: '50%',
+              backgroundColor: 'rgba(255, 255, 255, 0.1)',
+              backdropFilter: 'blur(10px)',
+              border: '1px solid rgba(255,255,255,0.4)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+              transition: 'all 0.2s',
+              color: 'white',
+              zIndex: 60,
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.25)';
+              e.currentTarget.style.transform = 'translateY(-50%) scale(1.1)';
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+              e.currentTarget.style.transform = 'translateY(-50%) scale(1)';
+            }}
+            title={`Lihat Detail ${character.name}`}
+          >
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+          </button>
+        )}
       </div>
 
       {/* ====== Progress Bar (dashed) ====== */}

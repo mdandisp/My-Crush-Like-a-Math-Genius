@@ -13,7 +13,7 @@ export default function CharacterCard({ char, index }: CharacterCardProps) {
       style={{ textDecoration: "none", display: "block" }}
     >
       <div
-        className="quiz-character-card desktop-only"
+        className="dashboard-character-card char-card-hover"
         style={{
           animationDelay: `${index * 0.15}s`,
           backgroundColor: "rgba(255, 255, 255, 0.15)",
@@ -21,8 +21,9 @@ export default function CharacterCard({ char, index }: CharacterCardProps) {
           borderRadius: "12px",
           boxShadow: "0 6px 20px rgba(0,0,0,0.2)",
           border: "2px solid rgba(255,255,255,0.25)",
-          width: "280px",
-          height: "400px",
+          width: "100%",
+          maxWidth: "280px",
+          height: "auto",
           position: "relative",
           overflow: "hidden",
           display: "flex",
@@ -38,13 +39,11 @@ export default function CharacterCard({ char, index }: CharacterCardProps) {
           className="char-image-hover"
           style={{
             width: "100%",
-            height: "100%",
-            position: "absolute",
-            bottom: "0",
-            left: "50%",
-            transform: "translateX(-50%)",
+            height: "auto",
+            display: "block",
             objectFit: "cover",
             zIndex: 1,
+            transition: "transform 0.3s ease",
           }}
         />
 
@@ -65,7 +64,10 @@ export default function CharacterCard({ char, index }: CharacterCardProps) {
         {/* Name & Concept */}
         <div
           style={{
-            position: "relative",
+            position: "absolute",
+            bottom: 0,
+            left: 0,
+            right: 0,
             zIndex: 3,
             padding: "1.5rem",
             textAlign: "center",

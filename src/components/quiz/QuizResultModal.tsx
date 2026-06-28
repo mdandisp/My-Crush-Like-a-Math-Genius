@@ -29,45 +29,6 @@ export default function QuizResultModal({
         position: "relative",
       }}
     >
-      {/* Trophy Icon */}
-      <Link
-        href="/leaderboard"
-        style={{
-          position: "absolute",
-          top: "1rem",
-          right: "1rem",
-          textDecoration: "none",
-        }}
-      >
-        <div
-          className="char-image-hover"
-          style={{
-            width: "50px",
-            height: "50px",
-            borderRadius: "50%",
-            backgroundColor: "rgba(255,255,255,0.15)",
-            border: "2px solid rgba(255,255,255,0.3)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontSize: "1.5rem",
-            cursor: "pointer",
-            transition: "all 0.2s",
-            boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
-          }}
-          onMouseOver={(e) => {
-            e.currentTarget.style.transform = "scale(1.15) translateY(-5px)";
-            e.currentTarget.style.backgroundColor = "rgba(255, 71, 126, 0.4)";
-          }}
-          onMouseOut={(e) => {
-            e.currentTarget.style.transform = "scale(1) translateY(0)";
-            e.currentTarget.style.backgroundColor = "rgba(255,255,255,0.15)";
-          }}
-          title="Lihat Papan Peringkat"
-        >
-          🏆
-        </div>
-      </Link>
 
       {/* Glass results card */}
       <div

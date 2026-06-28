@@ -566,57 +566,6 @@ function QuizContent({ params }: { params: Promise<{ id: string }> }) {
             position: "relative",
           }}
         >
-          {/* Mobile Speech Bubble to fill the gap */}
-          {quizState === "info" && (
-            <div
-              className="mobile-only animate-fade-in"
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "1rem",
-                backgroundColor: "rgba(30, 33, 48, 0.6)",
-                backdropFilter: "blur(10px)",
-                padding: "12px 15px",
-                borderRadius: "12px",
-                border: "1px solid rgba(255, 255, 255, 0.1)",
-              }}
-            >
-              <div
-                style={{
-                  width: "50px",
-                  height: "50px",
-                  borderRadius: "50%",
-                  backgroundColor: "#e8e0d8",
-                  backgroundImage: `url(${character.image})`,
-                  backgroundSize: "cover",
-                  backgroundPosition: "top center",
-                  border: "2px solid #f0944d",
-                  flexShrink: 0,
-                }}
-              ></div>
-              <div>
-                <h4
-                  style={{
-                    color: "#f0944d",
-                    fontSize: "0.85rem",
-                    margin: "0 0 4px 0",
-                  }}
-                >
-                  {character.name}
-                </h4>
-                <p
-                  style={{
-                    color: "white",
-                    fontSize: "0.9rem",
-                    margin: 0,
-                    fontStyle: "italic",
-                  }}
-                >
-                  "Ayo mulai kuisnya! Aku yakin kamu bisa."
-                </p>
-              </div>
-            </div>
-          )}
 
           {/* === INFO STATE === */}
           {quizState === "info" && (

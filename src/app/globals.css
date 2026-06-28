@@ -208,7 +208,7 @@ h6 {
 }
 
 .char-card-hover:hover .char-image-hover {
-  transform: translateX(-50%) scale(1.05) !important;
+  transform: scale(1.05) !important;
 }
 
 /* ========================================= */
@@ -308,8 +308,8 @@ h6 {
   }
 
   .quiz-character-card img {
-    object-fit: contain !important;
-    object-position: center !important;
+    object-fit: cover !important;
+    object-position: center top !important;
   }
 
   .quiz-options-wrapper {
@@ -370,6 +370,13 @@ h6 {
   .dialog-box-area {
     width: 95% !important;
     bottom: 1rem !important;
+  }
+
+  .dialog-char-img {
+    left: 50% !important;
+    top: auto !important;
+    bottom: 0 !important;
+    height: 70% !important;
   }
 
   .dialog-text-box {

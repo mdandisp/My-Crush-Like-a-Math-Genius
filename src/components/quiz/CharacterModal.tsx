@@ -1,4 +1,3 @@
-import Image from 'next/image';
 
 interface CharacterData {
   name: string;
@@ -56,11 +55,18 @@ export default function CharacterModal({ character, setShowCharacterModal }: Cha
         <h2 style={{ color: 'white', marginBottom: '1.5rem', textAlign: 'center' }}>{character.name}</h2>
 
         <div style={{ width: '100%', height: '400px', backgroundColor: 'transparent', borderRadius: '12px', overflow: 'hidden', position: 'relative', marginBottom: '1.5rem' }}>
-          <Image
+          <img
             src={character.image}
             alt={character.name}
-            fill
-            style={{ objectFit: 'contain', objectPosition: 'center' }}
+            style={{ 
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              objectFit: 'contain', 
+              objectPosition: 'center' 
+            }}
           />
         </div>
 
