@@ -48,6 +48,7 @@ function QuizContent({ params }: { params: Promise<{ id: string }> }) {
   // --- SESSION PERSISTENCE ---
   const clearSession = () => {
     localStorage.removeItem(`quizSession_${resolvedParams.id}`);
+    localStorage.removeItem(`quizFinished_${resolvedParams.id}`);
   };
 
   useEffect(() => {
@@ -65,23 +66,17 @@ function QuizContent({ params }: { params: Promise<{ id: string }> }) {
   }, [quizState, sessionId, totalQuestions, currentQ, correctAnswer]);
 
   useEffect(() => {
-    if (!isLoadingInfo && quizState === "info") {
-      const cached = localStorage.getItem(`quizSession_${resolvedParams.id}`);
-      if (cached) {
-        try {
-          const data = JSON.parse(cached);
-          setSessionId(data.sessionId);
-          setTotalQuestions(data.totalQuestions);
-          setCurrentQ(data.currentQ);
-          setCorrectAnswer(data.correctAnswer);
-          setQuizState("playing");
-          fetchNextQuestion(data.sessionId);
-        } catch (e) {
-          clearSession();
-        }
-      }
+    if (quizState === "finished") {
+      localStorage.setItem(`quizFinished_${resolvedParams.id}`, JSON.stringify({
+        score,
+        correctAnswer,
+        totalQuestions,
+        timeLeft
+      }));
     }
-  }, [isLoadingInfo, quizState]);
+  }, [quizState, score, correctAnswer, totalQuestions, timeLeft]);
+
+  // Session persistence is now checked inside fetchInfo to avoid render flashes
   // ---------------------------
 
   // Pre-flight check
@@ -135,6 +130,37 @@ function QuizContent({ params }: { params: Promise<{ id: string }> }) {
           // console.log(topic.max_attempts);
         } else {
           router.push("/dashboard");
+          return;
+        }
+
+        // Check LocalStorage for existing sessions before resolving loading state
+        const finishedCached = localStorage.getItem(`quizFinished_${resolvedParams.id}`);
+        if (finishedCached) {
+          try {
+            const data = JSON.parse(finishedCached);
+            setScore(data.score || 0);
+            setCorrectAnswer(data.correctAnswer || 0);
+            setTotalQuestions(data.totalQuestions || 5);
+            setTimeLeft(data.timeLeft || 0);
+            setQuizState("finished");
+          } catch(e) {
+            localStorage.removeItem(`quizFinished_${resolvedParams.id}`);
+          }
+        } else {
+          const cached = localStorage.getItem(`quizSession_${resolvedParams.id}`);
+          if (cached) {
+            try {
+              const data = JSON.parse(cached);
+              setSessionId(data.sessionId);
+              setTotalQuestions(data.totalQuestions);
+              setCurrentQ(data.currentQ);
+              setCorrectAnswer(data.correctAnswer);
+              setQuizState("playing");
+              fetchNextQuestion(data.sessionId);
+            } catch (e) {
+              clearSession();
+            }
+          }
         }
 
         // Fetch Topic Attempt Info
@@ -238,6 +264,7 @@ function QuizContent({ params }: { params: Promise<{ id: string }> }) {
   };
 
   const startQuiz = async () => {
+    clearSession();
     setCorrectAnswer(0);
     if (topicInfo?.remaining_attempts === 0) {
       toast.error("Batas percobaan untuk kuis ini sudah habis.");
@@ -798,6 +825,7 @@ function QuizContent({ params }: { params: Promise<{ id: string }> }) {
               totalQ={totalQ}
               timeLeft={timeLeft}
               formatTime={formatTime}
+              topicId={resolvedParams.id}
             />
           )}
         </div>

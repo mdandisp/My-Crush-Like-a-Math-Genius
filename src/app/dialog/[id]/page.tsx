@@ -72,11 +72,13 @@ function DialogContent({ params }: { params: Promise<{ id: string }> }) {
     if (currentLine < dialogues.length - 1) {
       setCurrentLine(currentLine + 1);
     } else {
+      localStorage.removeItem(`quizFinished_${resolvedParams.id}`);
       router.push(`/quiz/${resolvedParams.id}?level=${level}&count=${count}`);
     }
   };
 
   const handleSkip = () => {
+    localStorage.removeItem(`quizFinished_${resolvedParams.id}`);
     router.push(`/quiz/${resolvedParams.id}?level=${level}&count=${count}`);
   };
 

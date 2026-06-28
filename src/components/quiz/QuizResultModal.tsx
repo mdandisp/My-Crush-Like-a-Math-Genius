@@ -6,6 +6,7 @@ interface QuizResultModalProps {
   totalQ: number;
   timeLeft: number;
   formatTime: (s: number) => string;
+  topicId?: string;
 }
 
 export default function QuizResultModal({
@@ -14,6 +15,7 @@ export default function QuizResultModal({
   totalQ,
   timeLeft,
   formatTime,
+  topicId,
 }: QuizResultModalProps) {
   return (
     <div
@@ -121,10 +123,15 @@ export default function QuizResultModal({
       </div>
 
       {/* Buttons */}
-      <div style={{ display: "flex", gap: "1rem", marginTop: "2rem" }}>
+      <div style={{ display: "flex", gap: "1rem", marginTop: "2rem", justifyContent: "center", flexWrap: "wrap" }}>
         <Link href={`/profile`} style={{ textDecoration: "none" }}>
           <button className="btn-secondary">Lihat Profil</button>
         </Link>
+        {topicId && (
+          <Link href={`/topic/${topicId}`} style={{ textDecoration: "none" }}>
+            <button className="btn-primary" style={{ backgroundColor: "#f0944d" }}>Main Lagi</button>
+          </Link>
+        )}
         <Link href={`/dashboard`} style={{ textDecoration: "none" }}>
           <button className="btn-primary">Dashboard</button>
         </Link>

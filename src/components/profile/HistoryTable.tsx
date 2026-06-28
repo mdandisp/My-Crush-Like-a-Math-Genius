@@ -39,8 +39,8 @@ export default function HistoryTable({ history }: HistoryTableProps) {
                     </span>
                   </td>
                   <td style={{ padding: '12px' }}>{h.requestedQuestions}</td>
-                  <td style={{ padding: '12px', fontWeight: 'bold', whiteSpace: 'nowrap', color: h.score === h.requestedQuestions ? '#22c55e' : 'white' }}>
-                    {h.score !== null ? h.score : '-'} / {h.requestedQuestions}
+                  <td style={{ padding: '12px', fontWeight: 'bold', whiteSpace: 'nowrap', color: '#f0944d' }}>
+                    {h.score !== null ? h.score : '-'}
                   </td>
                 </tr>
               ))}

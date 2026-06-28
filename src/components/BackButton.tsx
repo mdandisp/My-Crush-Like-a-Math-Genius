@@ -4,29 +4,45 @@ interface BackButtonProps {
   href?: string;
   style?: React.CSSProperties;
   className?: string;
+  onClick?: () => void;
 }
 
-export default function BackButton({ href = "/", style, className }: BackButtonProps) {
+export default function BackButton({ href, style, className, onClick }: BackButtonProps) {
+  const commonStyle = {
+    color: 'white', 
+    textDecoration: 'none', 
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '40px',
+    height: '40px',
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    backdropFilter: 'blur(10px)',
+    border: '1px solid rgba(255, 255, 255, 0.2)',
+    borderRadius: '50%',
+    boxShadow: '0 4px 10px rgba(0,0,0,0.2)',
+    transition: 'all 0.2s',
+    cursor: 'pointer',
+    ...style
+  };
+
+  const Icon = (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M19 12H5M12 19l-7-7 7-7" />
+    </svg>
+  );
+
+  if (onClick) {
+    return (
+      <button onClick={onClick} className={className} style={commonStyle} type="button">
+        {Icon}
+      </button>
+    );
+  }
+
   return (
-    <Link href={href} className={className} style={{
-      color: 'white', 
-      textDecoration: 'none', 
-      display: 'inline-flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      width: '40px',
-      height: '40px',
-      backgroundColor: 'rgba(255, 255, 255, 0.15)',
-      backdropFilter: 'blur(10px)',
-      border: '1px solid rgba(255, 255, 255, 0.2)',
-      borderRadius: '50%',
-      boxShadow: '0 4px 10px rgba(0,0,0,0.2)',
-      transition: 'all 0.2s',
-      ...style
-    }}>
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M19 12H5M12 19l-7-7 7-7" />
-      </svg>
+    <Link href={href || "/"} className={className} style={commonStyle}>
+      {Icon}
     </Link>
   );
 }

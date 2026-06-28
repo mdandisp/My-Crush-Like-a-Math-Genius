@@ -10,8 +10,10 @@ import HistoryTable from '../../components/profile/HistoryTable';
 import ImageCropper from '../../components/profile/ImageCropper';
 import GlobalSpinner from '../../components/common/GlobalSpinner';
 import { AttemptHistory } from '../../types';
+import { useRouter } from 'next/navigation';
 
 export default function ProfilePage() {
+  const router = useRouter();
   const [history, setHistory] = useState<AttemptHistory[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
   const [userName, setUserName] = useState('Pemain');
@@ -159,7 +161,7 @@ export default function ProfilePage() {
         display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60px'
       }}>
         <div style={{ position: 'absolute', left: '2rem' }}>
-          <BackButton href="/dashboard" />
+          <BackButton onClick={() => router.back()} />
         </div>
         
         {/* Banner */}

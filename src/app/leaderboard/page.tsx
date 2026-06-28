@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import BackButton from '../../components/BackButton';
 import { fetchApi } from '../../utils/api';
 
@@ -13,6 +14,7 @@ function getRankBadgeColor(rank: number) {
 }
 
 export default function LeaderboardPage() {
+  const router = useRouter();
   const [filter, setFilter] = useState('all');
   const [topics, setTopics] = useState<any[]>([]);
   const [rankings, setRankings] = useState<any[]>([]);
@@ -114,13 +116,13 @@ export default function LeaderboardPage() {
 
       {/* Desktop Back button */}
       <div className="lb-back-desktop">
-        <BackButton href="/dashboard" />
+        <BackButton onClick={() => router.back()} />
       </div>
 
       {/* Header Row */}
       <div className="lb-header-container">
         <div className="lb-back-mobile">
-          <BackButton href="/dashboard" />
+          <BackButton onClick={() => router.back()} />
         </div>
         
         {/* Title Banner */}
